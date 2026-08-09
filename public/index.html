@@ -1,1 +1,1398 @@
-x
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teaching Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,500&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+
+  :root{
+    --paper: #FAF7F0;
+    --paper-line: #E4DCC8;
+    --ink: #2E3B32;
+    --board: #2C4A3E;
+    --board-light: #3E6152;
+    --chalk: #F5EFDC;
+    --ochre: #B8863B;
+    --ochre-soft: #EFE1C4;
+    --blue: #4C6E85;
+    --blue-soft: #E1ECF1;
+    --danger: #A6503B;
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-size:14px;
+    line-height:1.4;
+  }
+  button{
+    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    border-radius:7px;
+    border:1px solid transparent;
+    padding:8px 14px;
+    font-weight:700;
+  }
+  .btn-primary{background:var(--board); color:var(--chalk);}
+  .btn-primary:hover{background:var(--board-light);}
+  .btn-ghost{background:transparent; color:var(--board); border-color:var(--paper-line);}
+  .btn-ghost:hover{background:var(--ochre-soft); border-color:var(--ochre);}
+  .save-status{font-size:12px; color:var(--blue); opacity:0.85; margin-left:auto;}
+
+  /* ===== Hub layout ===== */
+  .hub-layout{display:flex; min-height:100vh;}
+  .hub-nav{
+    width:220px; flex-shrink:0; background:var(--board); color:var(--chalk);
+    padding:22px 14px; position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .hub-brand{
+    font-family:'Newsreader', serif; font-weight:700; font-size:19px;
+    margin:0 8px 22px; letter-spacing:0.2px;
+  }
+  .nav-link{
+    display:block; width:100%; text-align:left; background:transparent; border:none;
+    color:var(--chalk); padding:10px 12px; border-radius:7px; margin-bottom:4px;
+    font-weight:700; cursor:pointer; opacity:0.72; font-size:13.5px;
+  }
+  .nav-link:hover{opacity:1; background:rgba(245,239,220,0.08);}
+  .nav-link.active{opacity:1; background:rgba(245,239,220,0.16);}
+  .hub-main{flex:1; padding:24px 28px 60px; max-width:1400px; min-width:0;}
+  .hub-view{display:none;}
+  .hub-view.active{display:block;}
+
+  @media (max-width:800px){
+    .hub-layout{flex-direction:column;}
+    .hub-nav{width:100%; height:auto; position:relative; display:flex; align-items:center; gap:6px; padding:14px;}
+    .hub-brand{margin:0 10px 0 0;}
+    .nav-link{width:auto; margin-bottom:0;}
+    .hub-main{padding:18px;}
+  }
+
+  /* ===== Home view ===== */
+  .home-hero{margin-bottom:26px;}
+  .home-hero h1{font-family:'Newsreader',serif; font-size:26px; margin:0 0 6px; color:var(--board);}
+  .home-hero p{color:#6B6252; margin:0; max-width:560px;}
+  .tool-cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
+  .tool-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius);
+    padding:20px; cursor:pointer; text-align:left; display:flex; flex-direction:column; gap:8px;
+    border-top:4px solid var(--ochre);
+  }
+  .tool-card:hover{box-shadow:0 6px 18px rgba(44,74,62,0.1);}
+  .tool-card h2{font-family:'Newsreader',serif; font-size:18px; margin:0; color:var(--board);}
+  .tool-card p{margin:0; font-size:13px; color:#6B6252;}
+  .tool-card .go{font-size:12px; font-weight:700; color:var(--ochre);}
+  .tool-card.resources{border-top-color:var(--blue);}
+  .tool-card.resources .go{color:var(--blue);}
+
+  /* ===== Planner view (from ten-week planner) ===== */
+  header{
+    background:var(--board); color:var(--chalk); border-radius:var(--radius);
+    padding:22px 26px; margin-bottom:18px; position:relative; overflow:hidden;
+  }
+  header::after{
+    content:""; position:absolute; inset:0;
+    background-image:repeating-linear-gradient(transparent, transparent 27px, rgba(245,239,220,0.06) 28px);
+    pointer-events:none;
+  }
+  header h1{font-family:'Newsreader', serif; font-weight:700; font-size:24px; margin:0 0 4px;}
+  header .meta{display:flex; gap:18px; flex-wrap:wrap; align-items:baseline; margin-top:10px;}
+  header input[type=text]{
+    background:transparent; border:none; border-bottom:1px solid rgba(245,239,220,0.4);
+    color:var(--chalk); font-family:'Newsreader', serif; font-size:24px; font-weight:700;
+    padding:2px 0; width:min(560px, 90%);
+  }
+  header input[type=text]:focus{outline:none; border-bottom-color:var(--ochre);}
+  .cycle-field{display:flex; flex-direction:column; gap:2px;}
+  .cycle-field label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.75;}
+  .cycle-field input{
+    background:rgba(245,239,220,0.08); border:1px solid rgba(245,239,220,0.25); color:var(--chalk);
+    border-radius:6px; padding:5px 8px; font-family:'Atkinson Hyperlegible', sans-serif;
+    font-size:13px; width:90px;
+  }
+
+  .cycle-tabs{display:flex; gap:6px; margin-bottom:14px;}
+  .cycle-tab{
+    background:#fff; border:1px solid var(--paper-line); color:var(--ink);
+    border-radius:7px 7px 0 0; padding:8px 16px; font-weight:700; font-size:13px;
+    cursor:pointer; border-bottom:none; position:relative; top:1px; opacity:0.65;
+  }
+  .cycle-tab.active{opacity:1; color:#fff;}
+  .cycle-tab[data-n="1"].active{background:#C89B2E; border-color:#C89B2E;}
+  .cycle-tab[data-n="2"].active{background:#C46A2E; border-color:#C46A2E;}
+  .cycle-tab[data-n="3"].active{background:#C2597A; border-color:#C2597A;}
+  .cycle-tab[data-n="4"].active{background:#4A8A5C; border-color:#4A8A5C;}
+  header.c1{background:#C89B2E;}
+  header.c2{background:#C46A2E;}
+  header.c3{background:#C2597A;}
+  header.c4{background:#4A8A5C;}
+  table.c1 thead th, table.c1 thead th.subject-head{background:#C89B2E;}
+  table.c2 thead th, table.c2 thead th.subject-head{background:#C46A2E;}
+  table.c3 thead th, table.c3 thead th.subject-head{background:#C2597A;}
+  table.c4 thead th, table.c4 thead th.subject-head{background:#4A8A5C;}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+
+  .grid-scroll{overflow-x:auto; border:1px solid var(--paper-line); border-radius:var(--radius); background:#fff;}
+  table{border-collapse:collapse; width:100%; min-width:1180px;}
+  thead th{
+    position:sticky; top:0; z-index:3; background:var(--board); color:var(--chalk);
+    font-family:'Newsreader', serif; font-weight:600; text-align:left; padding:10px 10px;
+    font-size:13px; border-right:1px solid rgba(245,239,220,0.15);
+  }
+  thead th .wk-date{display:block; font-family:'Atkinson Hyperlegible',sans-serif; font-weight:400; font-size:11px; opacity:0.8; margin-top:2px;}
+  thead th .wk-note{display:block; font-family:'Atkinson Hyperlegible',sans-serif; font-weight:700; font-size:10px; color:var(--ochre); margin-top:3px;}
+  thead th input{background:transparent; border:none; color:inherit; font:inherit; width:100%; padding:0;}
+  thead th.subject-head{position:sticky; left:0; z-index:4; min-width:190px; background:var(--board);}
+  td.subject-cell{
+    position:sticky; left:0; z-index:2; background:var(--chalk); font-weight:700; color:var(--board);
+    padding:10px 12px; border-right:2px solid var(--ochre); border-bottom:1px solid var(--paper-line);
+    min-width:190px; max-width:190px;
+  }
+  td.subject-cell .bank-link{
+    display:block; font-weight:400; font-size:11px; color:var(--blue); margin-top:3px;
+    cursor:pointer; text-decoration:underline; text-decoration-style:dotted;
+  }
+  tbody tr:nth-child(even) td.subject-cell{background:#F0EAD8;}
+  td.cell{
+    border-bottom:1px solid var(--paper-line); border-right:1px solid var(--paper-line); padding:0;
+    vertical-align:top; min-width:150px; max-width:150px; height:64px;
+  }
+  .cell-inner{width:100%; height:100%; padding:8px 9px; font-size:12.5px; color:var(--ink); cursor:pointer; white-space:pre-wrap; overflow:hidden;}
+  .cell-inner:hover{background:var(--blue-soft);}
+  .cell-inner.empty{color:#B4AB98; font-style:italic;}
+  .cell-inner.filled{background:#FDFBF5;}
+  .week-hint{display:block; font-size:10px; color:var(--blue); margin-top:4px; font-style:italic; white-space:normal;}
+  .linked-item{font-size:12.5px; margin-bottom:6px;}
+  .linked-item strong{color:var(--board); font-weight:700; margin-right:4px;}
+  .linked-empty{font-size:11.5px; color:#8A8272; font-style:italic; margin-bottom:6px;}
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(44,74,62,0.35); display:none;
+    align-items:center; justify-content:center; z-index:20; padding:20px;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:#fff; border-radius:var(--radius); width:min(520px, 100%); max-height:85vh;
+    display:flex; flex-direction:column; box-shadow:0 12px 40px rgba(0,0,0,0.25);
+  }
+  .modal-head{padding:16px 20px; border-bottom:1px solid var(--paper-line); display:flex; justify-content:space-between; align-items:baseline;}
+  .modal-head h2{font-family:'Newsreader',serif; font-size:17px; margin:0; color:var(--board);}
+  .modal-head span{font-size:12px; color:var(--blue);}
+  .modal-body{padding:16px 20px; overflow-y:auto;}
+  .modal-body textarea{width:100%; min-height:90px; resize:vertical; border:1px solid var(--paper-line); border-radius:7px; padding:9px; font-family:inherit; font-size:13px; color:var(--ink);}
+  .modal-body textarea:focus{outline:2px solid var(--ochre); outline-offset:1px;}
+  .modal-body input[type=text], .modal-body input[type=url], .modal-body select{
+    width:100%; padding:8px 9px; border:1px solid var(--paper-line); border-radius:7px;
+    font-family:inherit; font-size:13px; color:var(--ink); margin-bottom:10px;
+  }
+  .field-label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--blue); margin:2px 0 6px;}
+  .bank-title{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--blue); margin:16px 0 6px;}
+  .bank-chips{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{background:var(--ochre-soft); border:1px solid var(--ochre); color:#6B4A1E; border-radius:14px; padding:5px 11px; font-size:12px; cursor:pointer;}
+  .chip:hover{background:var(--ochre); color:#fff;}
+  .no-bank{font-size:12px; color:#8A8272; font-style:italic;}
+  .ai-box{margin-top:16px; padding:12px 14px; background:var(--blue-soft); border:1px solid var(--blue); border-radius:8px;}
+  .ai-box input{width:100%; padding:7px 9px; border:1px solid var(--paper-line); border-radius:6px; font-family:inherit; font-size:12.5px; margin:6px 0 8px;}
+  .ai-status{font-size:11.5px; color:var(--blue); min-height:16px; margin-bottom:6px;}
+  .ai-chip{background:var(--blue-soft); border:1px solid var(--blue); color:var(--blue);}
+  .ai-chip:hover{background:var(--blue); color:#fff;}
+  .modal-foot{padding:14px 20px; border-top:1px solid var(--paper-line); display:flex; justify-content:space-between; gap:10px;}
+
+  .bank-list{display:flex; flex-direction:column; gap:6px; margin-bottom:12px;}
+  .bank-item{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; background:var(--paper); border:1px solid var(--paper-line); border-radius:7px; padding:8px 10px; font-size:12.5px;}
+  .bank-item button{background:none; border:none; color:var(--danger); font-weight:700; padding:2px 6px; font-size:16px; line-height:1;}
+  .add-row{display:flex; gap:8px;}
+  .add-row textarea{flex:1; min-height:44px;}
+  .add-row button{white-space:nowrap;}
+  .empty-state{font-size:12px; color:#8A8272; font-style:italic; padding:4px 0;}
+  footer{text-align:center; font-size:11px; color:#9B927D; margin-top:22px;}
+
+  /* ===== Resource bank view ===== */
+  .res-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
+  .res-toolbar input[type=text]{
+    padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px;
+    font-family:inherit; font-size:13px; min-width:200px;
+  }
+  .res-toolbar select{padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px; font-family:inherit; font-size:13px;}
+  .res-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px;}
+  .res-card{
+    background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius);
+    padding:14px 16px; display:flex; flex-direction:column; gap:6px;
+  }
+  .res-card .res-type{
+    align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase;
+    letter-spacing:0.05em; background:var(--blue-soft); color:var(--blue); padding:3px 8px; border-radius:10px;
+  }
+  .res-card h3{font-family:'Newsreader',serif; font-size:16px; margin:2px 0 0; color:var(--board);}
+  .res-card .res-subject{font-size:11.5px; color:var(--ochre); font-weight:700;}
+  .res-card p{font-size:12.5px; color:#5C5648; margin:2px 0 0; white-space:pre-wrap;}
+  .res-card .res-tags{font-size:11px; color:var(--blue); margin-top:2px;}
+  .res-card .res-actions{display:flex; gap:8px; margin-top:8px;}
+  .res-card .res-actions a, .res-card .res-actions button{font-size:12px;}
+  .res-card a.res-link{color:var(--blue); text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="hub-layout">
+  <nav class="hub-nav">
+    <div class="hub-brand">Teaching Hub</div>
+    <button class="nav-link active" data-view="home">Home</button>
+    <button class="nav-link" data-view="planner">Ten-Week Planner</button>
+    <button class="nav-link" data-view="resources">Resource Bank</button>
+    <button class="nav-link" id="syncSettingsBtn" style="margin-left:auto;">🔑 Sync</button>
+  </nav>
+
+  <main class="hub-main">
+
+    <!-- HOME -->
+    <section id="view-home" class="hub-view active">
+      <div class="home-hero">
+        <h1>Your teaching hub</h1>
+        <p>Everything for planning and resourcing your class in one place.</p>
+      </div>
+      <div class="tool-cards">
+        <button class="tool-card" data-goto="planner">
+          <h2>Ten-Week Planner</h2>
+          <p>Curriculum coverage and learning intentions across four ten-week cycles, with a curricular area bank and AI-assisted suggestions.</p>
+          <span class="go">Open planner →</span>
+        </button>
+        <button class="tool-card resources" data-goto="resources">
+          <h2>Resource Bank</h2>
+          <p>Store and organise lesson resources and links by subject, so you can find them again in seconds.</p>
+          <span class="go">Open resource bank →</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- PLANNER -->
+    <section id="view-planner" class="hub-view">
+      <header>
+        <input type="text" id="cycleTitle" value="Planning Cycle 2 (10 weeks)">
+        <div class="meta">
+          <div class="cycle-field"><label>Class</label><input type="text" id="className" value="P2"></div>
+        </div>
+      </header>
+
+      <div class="cycle-tabs" id="cycleTabs"></div>
+
+      <div class="toolbar">
+        <button class="btn-primary" id="exportBtn">Export as text</button>
+        <button class="btn-ghost" id="printBtn">Print view</button>
+        <button class="btn-ghost" id="resetBtn">Clear all entries</button>
+        <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
+        <span class="save-status" id="saveStatus">Loading…</span>
+      </div>
+
+      <div class="grid-scroll">
+        <table id="grid">
+          <thead><tr id="headRow"></tr></thead>
+          <tbody id="bodyRows"></tbody>
+        </table>
+      </div>
+
+      <footer>Curricular areas are stored per subject — build the bank once, then reuse it week to week.</footer>
+    </section>
+
+    <!-- RESOURCES -->
+    <section id="view-resources" class="hub-view">
+      <div class="home-hero">
+        <h1>Resource Bank</h1>
+        <p>Lesson resources and links, organised by subject.</p>
+      </div>
+      <div class="res-toolbar">
+        <button class="btn-primary" id="addResourceBtn">+ Add resource</button>
+        <input type="text" id="resSearch" placeholder="Search title, notes, tags…">
+        <select id="resSubjectFilter"><option value="">All subjects</option></select>
+        <span class="save-status" id="resSaveStatus">Loading…</span>
+      </div>
+      <div class="res-grid" id="resGrid"></div>
+      <div class="empty-state" id="resEmpty" style="display:none;">No resources saved yet — click "+ Add resource" to start building your bank.</div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Cell editor modal -->
+<div class="overlay" id="cellOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="cellModalTitle">Subject · Week</h2>
+      <span id="cellModalDate"></span>
+    </div>
+    <div class="modal-body">
+      <textarea id="cellText" placeholder="Curricular area / learning intention for this week…"></textarea>
+
+      <div class="bank-title">Quick insert from your bank</div>
+      <div class="bank-chips" id="cellChips"></div>
+      <div class="no-bank" id="noChips" style="display:none;">No saved curricular areas for this subject yet — add some via "Manage bank" below.</div>
+
+      <div id="weekProgramBox" style="display:none; margin-top:14px;"></div>
+      <div id="linkedTopicsBox" style="display:none; margin-top:14px;"></div>
+
+      <div class="ai-box">
+        <div class="bank-title">Ask AI to suggest an outcome</div>
+        <input type="text" id="aiContext" placeholder="Optional: this week's topic or focus…">
+        <button class="btn-ghost" id="aiSuggestBtn">Suggest outcomes</button>
+        <div class="ai-status" id="aiStatus"></div>
+        <div class="bank-chips" id="aiChips"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="manageBankBtn">Manage bank for this subject</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-ghost" id="cellCancel">Cancel</button>
+        <button class="btn-primary" id="cellSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bank manager modal -->
+<div class="overlay" id="bankOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="bankModalTitle">Bank · Subject</h2>
+      <span id="bankCount"></span>
+    </div>
+    <div class="modal-body">
+      <div class="bank-list" id="bankList"></div>
+      <div class="add-row">
+        <textarea id="bankNewText" placeholder="Paste a curricular area / outcome from your school plans…"></textarea>
+        <button class="btn-primary" id="bankAddBtn">Add</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span></span>
+      <button class="btn-ghost" id="bankClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resource editor modal -->
+<div class="overlay" id="resOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="resModalTitle">Add resource</h2>
+      <span></span>
+    </div>
+    <div class="modal-body">
+      <div class="field-label">Title</div>
+      <input type="text" id="resTitle" placeholder="e.g. Monkey King comprehension pack">
+      <div class="field-label">Subject</div>
+      <select id="resSubject"></select>
+      <div class="field-label">Type</div>
+      <select id="resType">
+        <option>Worksheet</option>
+        <option>Link</option>
+        <option>Video</option>
+        <option>Activity</option>
+        <option>Template</option>
+        <option>Other</option>
+      </select>
+      <div class="field-label">Link (optional)</div>
+      <input type="url" id="resUrl" placeholder="https://…">
+      <div class="field-label">Notes</div>
+      <textarea id="resNotes" placeholder="What it's for, where it's saved, differentiation notes…"></textarea>
+      <div class="field-label">Tags (comma separated, optional)</div>
+      <input type="text" id="resTags" placeholder="e.g. differentiated, P3, group work">
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="resDeleteBtn" style="display:none; color:var(--danger);">Delete</button>
+      <div style="display:flex; gap:8px; margin-left:auto;">
+        <button class="btn-ghost" id="resCancel">Cancel</button>
+        <button class="btn-primary" id="resSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sync setup modal (first run, or switching devices) -->
+<div class="overlay" id="syncOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Set up sync</h2>
+      <span></span>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px; color:#5C5648; margin-top:0;">Your data syncs across devices using a personal key — no account needed. Generate a new key on your first device, then enter that same key on any other device to see the same data.</p>
+
+      <div class="field-label">New here? Generate a key</div>
+      <button class="btn-primary" id="genKeyBtn">Generate a new sync key</button>
+      <div id="newKeyBox" style="display:none; margin-top:12px; padding:12px; background:var(--paper); border:1px solid var(--paper-line); border-radius:8px;">
+        <div class="field-label">Your key — save this somewhere safe (e.g. a password manager). It cannot be recovered if lost.</div>
+        <div id="newKeyDisplay" style="font-family:monospace; font-size:13px; word-break:break-all; background:#fff; padding:8px; border-radius:6px; border:1px solid var(--paper-line);"></div>
+        <button class="btn-primary" id="confirmNewKeyBtn" style="margin-top:10px;">I've saved it — continue</button>
+      </div>
+
+      <div class="field-label" style="margin-top:20px;">Already have a key? Enter it</div>
+      <input type="text" id="existingKeyInput" placeholder="Paste your sync key">
+      <button class="btn-ghost" id="useExistingKeyBtn">Use this key</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sync settings modal -->
+<div class="overlay" id="syncSettingsOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Sync settings</h2>
+      <span></span>
+    </div>
+    <div class="modal-body">
+      <div class="field-label">Your current sync key</div>
+      <div id="currentKeyDisplay" style="font-family:monospace; font-size:13px; word-break:break-all; background:var(--paper); padding:8px; border-radius:6px; border:1px solid var(--paper-line); margin-bottom:14px;"></div>
+      <p style="font-size:12.5px; color:#5C5648;">Enter this same key on another device to see the same data there.</p>
+      <button class="btn-ghost" id="switchKeyBtn">Use a different key on this device</button>
+    </div>
+    <div class="modal-foot">
+      <span></span>
+      <button class="btn-ghost" id="syncSettingsClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Cloud sync (Netlify Blobs via sync key) ============ */
+const SYNC_KEY_STORAGE = 'teachingHubSyncKey';
+let syncKey = localStorage.getItem(SYNC_KEY_STORAGE);
+
+function generateSyncKey(){
+  const bytes = crypto.getRandomValues(new Uint8Array(18));
+  return Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+const cloudStorage = {
+  async get(key){
+    const res = await fetch(`/.netlify/functions/data?key=${encodeURIComponent(key)}`, {
+      headers: { 'Authorization': 'Bearer ' + syncKey }
+    });
+    if(!res.ok) throw new Error('Storage read failed (' + res.status + ')');
+    const data = await res.json();
+    return data.value != null ? { value: data.value } : null;
+  },
+  async set(key, value){
+    const res = await fetch(`/.netlify/functions/data?key=${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + syncKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value })
+    });
+    if(!res.ok) throw new Error('Storage write failed (' + res.status + ')');
+    return { key, value };
+  }
+};
+
+function showSyncSetup(){
+  document.getElementById('syncOverlay').classList.add('open');
+}
+function closeSyncSetup(){
+  document.getElementById('syncOverlay').classList.remove('open');
+}
+function finishSyncSetup(key){
+  syncKey = key;
+  localStorage.setItem(SYNC_KEY_STORAGE, key);
+  closeSyncSetup();
+  loadState();
+  loadResources();
+}
+document.getElementById('genKeyBtn').addEventListener('click', ()=>{
+  const key = generateSyncKey();
+  document.getElementById('newKeyDisplay').textContent = key;
+  document.getElementById('newKeyBox').style.display = 'block';
+  document.getElementById('confirmNewKeyBtn').onclick = ()=> finishSyncSetup(key);
+});
+document.getElementById('useExistingKeyBtn').addEventListener('click', ()=>{
+  const key = document.getElementById('existingKeyInput').value.trim();
+  if(key.length < 16){ alert('That key looks too short — check you copied it in full.'); return; }
+  finishSyncSetup(key);
+});
+document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
+  document.getElementById('currentKeyDisplay').textContent = syncKey || '(not set)';
+  document.getElementById('syncSettingsOverlay').classList.add('open');
+});
+document.getElementById('syncSettingsClose').addEventListener('click', ()=>{
+  document.getElementById('syncSettingsOverlay').classList.remove('open');
+});
+document.getElementById('switchKeyBtn').addEventListener('click', ()=>{
+  document.getElementById('syncSettingsOverlay').classList.remove('open');
+  document.getElementById('newKeyBox').style.display = 'none';
+  document.getElementById('existingKeyInput').value = '';
+  showSyncSetup();
+});
+
+if(!syncKey){
+  showSyncSetup();
+}
+
+/* ============ Hub navigation ============ */
+document.querySelectorAll('.nav-link').forEach(btn=>{
+  btn.addEventListener('click', ()=>goto(btn.dataset.view));
+});
+document.querySelectorAll('[data-goto]').forEach(btn=>{
+  btn.addEventListener('click', ()=>goto(btn.dataset.goto));
+});
+function goto(view){
+  document.querySelectorAll('.hub-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+}
+
+/* ============ PLANNER ============ */
+const SUBJECTS = [
+  "Ethos and Life of the School",
+  "Health and Wellbeing",
+  "P.E",
+  "Numeracy (Big Maths CLIC)",
+  "Mathematics",
+  "Literacy – Writing",
+  "Literacy – Spelling/Phonics",
+  "Literacy – Grammar",
+  "Literacy – Reading",
+  "Literacy – Listening and Talking",
+  "Literacy – Handwriting",
+  "1+2",
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies"
+];
+const BGE_SUBJECT = "RME / Expressive Arts / Sciences / Social Studies / Technologies";
+const WRITING_SUBJECT = "Literacy – Writing";
+const LISTENING_SUBJECT = "Literacy – Listening and Talking";
+
+const BLANK_WEEKS = Array.from({length:10}, (_,i)=>({date:"", note:""}));
+
+const LITERACY_SEED = {
+  "Literacy – Listening and Talking": [
+    "LIT 1-01a: Regularly select and listen to or watch texts I enjoy and find interesting, and explain why I prefer certain sources.",
+    "LIT 1-02a: Know when and how to listen, when to talk, how much to say, when to ask questions and how to respond with respect.",
+    "ENG 1-03a: Explore how pace, gesture, expression, emphasis and choice of words engage others, and use what I learn.",
+    "LIT 1-04a: Identify and discuss the purpose, key words and main ideas of a text I've listened to/watched, and use this for a specific purpose.",
+    "LIT 1-05a: Make notes under given headings from listening/watching, and use these to understand or create new texts.",
+    "LIT 1-06a: Select ideas and relevant information, organise in a logical sequence, and use interesting/useful words for others.",
+    "LIT 1-07a: Show understanding of what I listen to or watch by responding to and asking different kinds of questions.",
+    "LIT 1-08a: Learning to recognise the difference between fact and opinion to develop an informed view.",
+    "LIT 1-09a: Exchange information, experiences, explanations, ideas and opinions; clarify points by asking questions.",
+    "LIT 1-10a: Communicate clearly when engaging with others, using selected resources as required."
+  ],
+  "Literacy – Reading": [
+    "LIT 1-11a / LIT 2-11a: Regularly select and read texts I enjoy and find interesting, and explain why I prefer certain texts/authors.",
+    "ENG 1-12a: Use knowledge of sight vocabulary, phonics, context clues, punctuation and grammar to read with understanding and expression.",
+    "LIT 1-13a: Select and use strategies and resources before and during reading to help make meaning clear.",
+    "LIT 1-14a: Use knowledge of text features to find, select, sort and use information for a specific purpose.",
+    "LIT 1-15a: Make notes under given headings to understand information, explore ideas/problems and create new texts.",
+    "LIT 1-16a: Identify and consider the purpose and main ideas of a text to show understanding.",
+    "ENG 1-17a: Respond to different kinds of questions and close reading tasks; learning to create questions of my own.",
+    "LIT 1-18a: Learning to recognise the difference between fact and opinion to develop an informed view.",
+    "ENG 1-19a: Share thoughts on structure, characters and/or setting, recognise the writer's message, relate to own experience, comment on word choice."
+  ],
+  "Literacy – Writing": [
+    "LIT 1-25a: Use notes and other writing to understand information/ideas, explore problems, generate and develop ideas or create new text.",
+    "LIT 1-26a: By considering text type, select ideas and relevant information, organise logically, use interesting/useful words.",
+    "LIT 1-20a / LIT 2-20a: Enjoy creating texts of my own; regularly select subject, purpose, format and resources to suit audience.",
+    "LIT 1-28a / LIT 1-29a: Convey information, describe events or processes, share opinions or persuade my reader in different ways.",
+    "ENG 1-30a: Describe and share my experiences and how they made me feel.",
+    "ENG 1-31a: Having explored elements writers use in different genres, create own stories/poems/plays with interesting structures, characters and/or settings."
+  ],
+  "Literacy – Grammar": [
+    "LIT 1-22a: Write independently, use appropriate punctuation, and order and link sentences so they make sense.",
+    "LIT 1-23a: Throughout the writing process, check that my writing makes sense."
+  ],
+  "Literacy – Spelling/Phonics": [
+    "LIT 1-21a: Spell the most commonly used words using knowledge of letter patterns and spelling rules; use resources for tricky/unfamiliar words."
+  ],
+  "Literacy – Handwriting": [
+    "LIT 1-24a: Present writing in a way that is legible and attractive, combining words, images and other features."
+  ]
+};
+
+const NUMERACY_SEED = {
+  "Numeracy (Big Maths CLIC)": [
+    "MNU 1-01a: Share ideas with others to develop ways of estimating the answer to a calculation or problem, work out the actual answer, then check by comparing with the estimate.",
+    "MNU 1-02a: Investigate how whole numbers are constructed, understand the importance of zero within the system, and use this to explain the link between a digit, its place and its value.",
+    "MNU 1-03a: Use addition, subtraction, multiplication and division when solving problems, making best use of mental strategies and written skills."
+  ],
+  "Mathematics": [
+    "MTH 1-17a/18a: Describe, follow and record routes and journeys using direction and turning, signs, words and angles.",
+    "MTH 1-19a: Develop awareness of where grid reference systems are used in everyday contexts and use them to locate and describe position.",
+    "Symmetry (First Level): Explore symmetry in my own and the wider environment; create and recognise symmetrical pictures, patterns and shapes.",
+    "MNU 1-22a: Use appropriate vocabulary to describe the likelihood of events occurring, using knowledge and experience of myself and others.",
+    "MNU 1-20a: Explore a variety of ways data is presented and ask and answer questions about the information it contains.",
+    "MNU 1-20b: Use a range of ways to collect information and sort it in a logical, organised and imaginative way using my own and others' criteria.",
+    "MNU 1-21a: Using technology and other methods, display data simply, clearly and accurately by creating tables, charts and diagrams, using simple labelling and scale.",
+    "MTH 1-15a: Compare, describe and show number relationships using appropriate vocabulary and the symbols for equals, not equal to, less than and greater than.",
+    "MTH 1-15b: Find the value of a picture or symbol used to replace a number in a number statement, using my knowledge of number facts.",
+    "MNU 1-07b: Find a fraction of an amount by applying my knowledge of division, through exploring how groups of items can be shared equally.",
+    "MNU 1-07c: Demonstrate understanding of simple equivalent fractions through practical activities including pictorial representations.",
+    "MTH 1-12a: Discuss the important part numbers play in the world and explore number systems used by civilisations throughout history.",
+    "MNU 1-11a: Estimate how long or heavy an object is, or what amount it holds, using everyday things as a guide, then measure or weigh using appropriate instruments and units.",
+    "MNU 1-11b: Estimate the area of a shape by counting squares or other methods.",
+    "MNU 1-09a: Use money to pay for items and work out how much change I should receive.",
+    "MNU 1-09b: Investigate how different combinations of coins and notes can be used to pay for goods or be given in change.",
+    "MTH 1-13a: Continue and devise more involved repeating patterns or designs, using a variety of media.",
+    "MTH 1-13b: Through exploring number patterns, recognise and continue simple number sequences and explain the rule applied.",
+    "MTH 1-16a: Explore simple 3D objects and 2D shapes and identify, name and describe their features using appropriate vocabulary.",
+    "MTH 1-16b: Explore and discuss how and why different shapes fit together and create a tiling pattern with them.",
+    "MNU 1-10a: Tell the time using 12 hour clocks, realising there is a link with 24 hour notation, and explain how it impacts on my daily routine.",
+    "MNU 1-10b: Develop a sense of how long tasks take by measuring the time taken to complete a range of activities using a variety of timers."
+  ]
+};
+
+const RME_SEED = {
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "RME 1-01a: Through exploring Bible stories, describe some beliefs Christians have about God and Jesus.",
+    "RME 1-01c: Talk about my own beliefs, or express them in other ways.",
+    "RME 1-02a: Having explored biblical and other Christian stories, show developing understanding of key values of Christianity and how they might be put into action in people's lives and communities.",
+    "RME 1-02b: Describe the key features of the values of Christianity which are expressed in stories.",
+    "RME 1-01b: By exploring places and investigating artefacts, develop knowledge of Christian beliefs and awareness of the role of Christianity in Scottish society and the world.",
+    "RME 1-03b: Develop an awareness of the ways in which Christians celebrate different times of year and relate these to my own life and community.",
+    "RME 1-04a: Through exploring stories from world religions, describe some of their key beliefs.",
+    "RME 1-09b: Show understanding of values such as caring, sharing, fairness, equality and love."
+  ]
+};
+
+const BUNDLE2_SEED = {
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "EXA 1-06a: Use exploration and imagination to solve design problems related to real-life situations.",
+    "EXA 1-10a: Become aware of different features of dance and practise and perform steps, formations and a short dance.",
+    "EXA 1-13a: Inspired by a range of stimuli, express and communicate my ideas, thoughts and feelings through drama.",
+    "EXA 1-14a: Develop confidence and skills in creating and presenting drama which explores real and imaginary situations, using improvisation and script.",
+    "EXA 1-17a: Use my voice, musical instruments and music technology to discover and enjoy playing with sound and rhythm.",
+    "SCN 1-07a: By investigating forces on toys and other objects, predict the effect on the shape or motion of objects.",
+    "SCN 1-08a: By exploring the forces exerted by magnets on other magnets and magnetic materials, contribute to the design of a game.",
+    "SCN 1-05a: By investigating how water can change from one form to another, relate my findings to everyday experiences.",
+    "SCN 1-16a: Make and test predictions about solids dissolving in water and relate my findings to the world around me.",
+    "SCN 1-15a: Through exploring properties and sources of materials, choose appropriate materials to solve practical challenges.",
+    "SOC 1-04a: Compare aspects of people's daily lives in the past with my own, using historical evidence or the experience of recreating an historical setting.",
+    "SOC 1-06a: Consider ways of looking after my school or community and encourage others to care for their environment.",
+    "SOC 1-08a: By exploring my community and the groups within it, identify and consider different types of housing and how they meet needs.",
+    "SOC 1-11a: Through activities in my local area, develop my mental map and sense of place, and create and use maps of the area.",
+    "SOC 1-14a: Develop an understanding of the importance of local organisations in providing for the needs of my local community.",
+    "TCH 1-04a: Use a range of simple food preparation techniques when working with food.",
+    "TCH 1-04b: Use a range of tools and equipment when working with textiles.",
+    "TCH 1-04c: Develop and use problem solving strategies to meet challenges with a food or textile focus.",
+    "TCH 1-04d: Adapt and improve ideas and express my own thinking in different ways.",
+    "TCH 1-13a: Explore and comment on processes in the world around me, making use of core computational thinking concepts, and organise information in a logical way.",
+    "TCH 1-14a: Understand the instructions of a visual programming language and predict the outcome of a program written using the language.",
+    "TCH 1-14b: Understand how computers process information.",
+    "TCH 1-15a: Demonstrate a range of basic problem-solving skills by building simple programs to carry out a given task, using an appropriate language."
+  ]
+};
+const BUNDLE2_CONTEXTS = "Suggested contexts: Water (flooding), Transport, Enterprise (textiles design), Development of Technology (Inventors); Other: Winter/Arctic theme, Mapping, Sustainability, Toys & Games.";
+
+const MLAN_SEED = {
+  "1+2": [
+    "MLAN 1-1a/1b/1c: Participate actively in songs, rhymes and poems in the target language; identify some rhyming words; recall selected 'missing' words/phrases in well-practised songs, rhymes or poems.",
+    "MLAN 1-2a/2b: Demonstrate understanding of familiar words and simple phrases conveying personal information; respond appropriately to simple questions about myself using simple sentences, words and gestures.",
+    "Greetings & salutations: Bonjour/Salut, Au revoir, Ça va? Ça va bien merci, S'il te plaît.",
+    "Saying/asking your name: Je m'appelle…, Comment tu t'appelles?",
+    "Colours: bleu, rouge, jaune, orange, violet, indigo, blanc, noir, gris, marron — C'est quelle couleur?",
+    "Numbers 1–12 and telling the time: C'est le 1…, Quelle heure est-il?",
+    "Days of the week: lundi, mardi, mercredi, jeudi, vendredi, samedi, dimanche.",
+    "Pets: Moi, j'ai un chat / Je n'ai pas de chat / Je voudrais un chien; describing a pet's colour and size.",
+    "Family members: C'est ma maman/mon papa, ma sœur/mon frère.",
+    "Food, vegetables and fruit + shopping phrases: Je voudrais deux pommes, s'il vous plaît; C'est combien?",
+    "Asking/saying your age: Quel âge as-tu? J'ai 6 ans.",
+    "Describing yourself (face and body): J'ai les yeux bleus, c'est mon nez/ma bouche.",
+    "Describing emotions: Comment ça va? Je suis triste/content(e).",
+    "Classroom instructions: Asseyez-vous, Levez-vous, Écoutez/Regardez/Répétez."
+  ]
+};
+
+const GRAMMAR_P2_SEED = {
+  "Literacy – Grammar": [
+    "Punctuation: capital letters & full stops — write 2+ sentences independently, starting with a capital letter and ending with a full stop.",
+    "Punctuation: begin experimenting with exclamation marks.",
+    "Punctuation: begin experimenting with question marks.",
+    "Punctuation: proper nouns — start using capital letters for proper nouns, e.g. days of the week.",
+    "Punctuation: apostrophes/contractions — begin to recognise how contractions are formed, e.g. didn't = did not, couldn't = could not.",
+    "P2 only: consolidate formation of lower case and capital letters; finger spaces.",
+    "Word knowledge: prepositions — up, down, in, out, into, to, onto, under, inside, outside.",
+    "Word knowledge: prefixes — use 'un' to create antonyms, e.g. happy/unhappy.",
+    "Word knowledge: suffixes — add 'ed' and 'ing'.",
+    "Word knowledge: connectives — introduce 'and', 'because'.",
+    "Word knowledge: sentence openers — use time connectives to sequence events, e.g. First, Second, Then.",
+    "Word knowledge: similes — introduce similes.",
+    "Word knowledge: dictionary — show awareness of how to use a simple picture dictionary.",
+    "Word knowledge: homophones — introduce the term and look at examples.",
+    "Word knowledge: personal pronouns — introduce and use in simple sentences, e.g. He, She, We, They, I.",
+    "Word knowledge: verbs — introduce simple verbs, e.g. run, walk, leap.",
+    "Word knowledge: adverbs — introduce 'ly' adverbs, e.g. Quickly, the cat scurried into the field.",
+    "Word knowledge: adjectives — describe an object, e.g. the fluffy cat; identify adjectives in sentences/writing.",
+    "Word knowledge: determiners — the, a, an, my, your, his, her.",
+    "Word knowledge: singular and plural — understand by 'adding s'.",
+    "Word knowledge: subject–verb agreement — I have/He has, I do/He does, I am/He is.",
+    "Word knowledge: introduce First and Third Person.",
+    "Word knowledge: tenses — introduce simple past tense orally, e.g. He walked to school.",
+    "P2 only: introduce common nouns, e.g. table; identify vowels and consonants in words."
+  ]
+};
+
+/* Week-numbered programmes (weeks 1-40 = Cycles 1-4 x 10 weeks). Shown as a hint next to each planner week. */
+const PHONICS_PLAN = {
+  1:{sounds:"ng",blends:"br th (ng at end)",common:"bring, thing",tricky:"many"},
+  2:{sounds:"oy",blends:"(oy at end)",common:"again, some, very",tricky:""},
+  3:{sounds:"oa",blends:"(oa at start/middle)",common:"who, two, don't",tricky:""},
+  4:{sounds:"Consolidation (incl. P1 sounds)",blends:"",common:"",tricky:""},
+  5:{sounds:"ss zz",blends:"bl fl gl cr",common:"miss",tricky:"because, long"},
+  6:{sounds:"ll",blends:"sw sp sk sm sh th ch shr (-all)",common:"all, call",tricky:""},
+  7:{sounds:"ff ph sc",blends:"gr",common:"green, off",tricky:"when, which"},
+  8:{sounds:"Consolidation",blends:"",common:"",tricky:""},
+  9:{sounds:"ar",blends:"ur st sc sp sl sm ch bl",common:"after",tricky:"Mrs, Mr"},
+  10:{sounds:"er or",blends:"st sh ch",common:"number, never",tricky:"another, mother"},
+  11:{sounds:"ir (bossy r)",blends:"st sh th",common:"girl, three, first",tricky:"school, other"},
+  12:{sounds:"Consolidation (esp. ir)",blends:"",common:"",tricky:""},
+  13:{sounds:"ay",blends:"pl cl tr st",common:"away, today, play",tricky:"always"},
+  14:{sounds:"ea (leaf)",blends:"dr cr st",common:"year, each, eat, dream",tricky:""},
+  15:{sounds:"ow (snow)",blends:"sn bl sl cr gl fl",common:"grow",tricky:"yellow"},
+  16:{sounds:"Consolidation — consonant blends",blends:"",common:"",tricky:""},
+  17:{sounds:"ue",blends:"bl gl tr",common:"blue, tree",tricky:"what, where"},
+  18:{sounds:"aw",blends:"th cl fl pr dr cr",common:"saw, claw, draw, crawl",tricky:""},
+  19:{sounds:"oi",blends:"sp st",common:"every, were",tricky:""},
+  20:{sounds:"Consolidation — consonant blends",blends:"",common:"",tricky:""},
+  21:{sounds:"au",blends:"cl st",common:"people, Autumn, August",tricky:""},
+  22:{sounds:"ew",blends:"br gr cr",common:"new, grew, crew, drew",tricky:""},
+  23:{sounds:"(blends only)",blends:"scr spl spr str",common:"four, too",tricky:""},
+  24:{sounds:"Consolidation",blends:"",common:"",tricky:""},
+  25:{sounds:"ow (owl)",blends:"pr tr cr fr dr cl fl",common:"how, now, down",tricky:""},
+  26:{sounds:"y (as I) — imposter 'y'",blends:"",common:"fly, try",tricky:"why"},
+  27:{sounds:"ou (found)",blends:"-ch -nd",common:"hand, out",tricky:"find, our"},
+  28:{sounds:"Consolidation",blends:"",common:"",tricky:""},
+  29:{sounds:"igh",blends:"th fl sl bl fr",common:"right, them",tricky:"there, only"},
+  30:{sounds:"a-e e-e (magic e)",blends:"",common:"these, make, made, came, here",tricky:""},
+  31:{sounds:"o-e i-e u-e (magic e)",blends:"",common:"home, more, five, time, life, like",tricky:""},
+  32:{sounds:"Consolidation",blends:"",common:"",tricky:""},
+  33:{sounds:"kn mb (silent letters)",blends:"",common:"their, know",tricky:""},
+  34:{sounds:"-nk -mp",blends:"",common:"jump, think",tricky:""},
+  35:{sounds:"-lt -ft -pt -st -nt",blends:"",common:"want, said",tricky:""},
+  36:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
+  37:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
+  38:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
+  39:{sounds:"Consolidation & assess for transition",blends:"",common:"",tricky:""},
+  40:{sounds:"Consolidation & assess for transition",blends:"",common:"",tricky:""}
+};
+const HANDWRITING_PLAN = {
+  1:"Fine motor and writing opportunities", 2:"Fine motor and writing opportunities",
+  3:"cao CAO", 4:"qg QG", 5:"de DE", 6:"sfl SFL", 7:"Consolidation & assessment",
+  8:"itu ITU", 9:"jy JY", 10:"rmn RMN", 11:"hb HB", 12:"Consolidation & assessment",
+  13:"kpv KPV", 14:"wxz WXZ", 15:"Consolidation & Assessment", 16:"Consolidation & Assessment",
+  17:"ll li", 18:"ti il", 19:"it ill", 20:"ut at", 21:"ull all", 22:"Consolidation & Assessment",
+  23:"in un", 24:"an im", 25:"um am", 26:"ine ime", 27:"Consolidation & Assessment",
+  28:"ar aw", 29:"iv hu", 30:"ki du", 31:"Consolidation & Assessment",
+  32:"ay ey", 33:"ip up", 34:"ib ub", 35:"Consolidation & Assessment",
+  36:"th ck", 37:"ch ent", 38:"ant till", 39:"Consolidation & Assessment", 40:"Consolidation & Assessment"
+};
+function phonicsHint(week){
+  const p = PHONICS_PLAN[week];
+  if(!p) return "";
+  if(p.sounds.startsWith("Consolidation")) return `Wk${week}: ${p.sounds}`;
+  const parts = [p.sounds];
+  if(p.blends) parts.push(p.blends);
+  if(p.common) parts.push("common: " + p.common);
+  if(p.tricky) parts.push("tricky: " + p.tricky);
+  return `Wk${week}: ` + parts.join(" · ");
+}
+function handwritingHint(week){
+  const h = HANDWRITING_PLAN[week];
+  return h ? `Wk${week}: ${h}` : "";
+}
+
+/* P.E yearly overview (P2), weeks 1-40 across Terms 1-4 */
+const PE_PLAN = {};
+(function(){
+  const blocks = [
+    [1,4,"Racquet Sports"],
+    [5,8,"Small Equipment Developmental Play"],
+    [9,12,"Games – Ball Skills"],
+    [13,16,"Dance"],
+    [17,20,"Gymnastics"],
+    [21,24,"Racquet Sports"],
+    [25,28,"Games – Ball Skills"],
+    [29,29,"FUN themed fitness"],
+    [30,32,"FUN themed fitness"],
+    [33,36,"Athletics"],
+    [37,40,"Striking and Fielding Games / Orienteering"]
+  ];
+  blocks.forEach(([start,end,topic])=>{
+    for(let w=start; w<=end; w++) PE_PLAN[w] = topic;
+  });
+})();
+function peHint(week){
+  const p = PE_PLAN[week];
+  return p ? `Wk${week}: ${p}` : "";
+}
+
+function defaultCycle(n, title, weeks){
+  return {
+    cycleTitle: title,
+    className: "P2",
+    weeks: JSON.parse(JSON.stringify(weeks)),
+    cells: {}
+  };
+}
+
+let state = {
+  activeCycle: 2,
+  banks: {},
+  cycles: {
+    1: defaultCycle(1, "Planning Cycle 1 (10 weeks)", BLANK_WEEKS),
+    2: defaultCycle(2, "Planning Cycle 2 (10 weeks)", [
+      {date:"9/11/26",  note:"*13/11 Inservice"},
+      {date:"16/11/26", note:""},
+      {date:"23/11/26", note:""},
+      {date:"30/11/26", note:""},
+      {date:"7/12/26",  note:""},
+      {date:"14/12/26", note:""},
+      {date:"21/12/26", note:"*T2 ends 22/12"},
+      {date:"4/1/27",   note:"*T3 starts 5/1"},
+      {date:"11/1/27",  note:""},
+      {date:"18/1/27",  note:""}
+    ]),
+    3: defaultCycle(3, "Planning Cycle 3 (10 weeks)", BLANK_WEEKS),
+    4: defaultCycle(4, "Planning Cycle 4 (10 weeks)", BLANK_WEEKS)
+  }
+};
+
+let activeCell = null;
+let activeBankSubject = null;
+const STORAGE_KEY = "ten-week-planner-state";
+const saveStatus = document.getElementById('saveStatus');
+
+function cur(){ return state.cycles[state.activeCycle]; }
+function cellKey(subject, wi){ return subject + "|" + wi; }
+
+function renderTabs(){
+  const wrap = document.getElementById('cycleTabs');
+  wrap.innerHTML = [1,2,3,4].map(n=>
+    `<div class="cycle-tab ${n===state.activeCycle?'active':''}" data-n="${n}">Cycle ${n}</div>`
+  ).join('');
+  wrap.querySelectorAll('.cycle-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      state.activeCycle = parseInt(tab.dataset.n);
+      render();
+    });
+  });
+}
+
+async function loadState(){
+  try{
+    const res = await cloudStorage.get(STORAGE_KEY);
+    if(res && res.value){
+      const loaded = JSON.parse(res.value);
+      state = Object.assign(state, loaded);
+    }
+    saveStatus.textContent = "Synced";
+  }catch(e){
+    saveStatus.textContent = "Starting fresh";
+  }
+  render();
+}
+
+let saveTimer = null;
+function persist(){
+  saveStatus.textContent = "Saving…";
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{
+      await cloudStorage.set(STORAGE_KEY, JSON.stringify(state));
+      saveStatus.textContent = "Saved";
+    }catch(e){
+      saveStatus.textContent = "Couldn't save — check connection";
+    }
+  }, 250);
+}
+
+function render(){
+  renderTabs();
+  const c = cur();
+  const headerEl = document.querySelector('#view-planner header');
+  headerEl.className = 'c' + state.activeCycle;
+  document.getElementById('grid').className = 'c' + state.activeCycle;
+  document.getElementById('cycleTitle').value = c.cycleTitle;
+  document.getElementById('className').value = c.className;
+
+  const headRow = document.getElementById('headRow');
+  headRow.innerHTML = '<th class="subject-head">Curricular Area</th>' +
+    c.weeks.map((w,i)=>`
+      <th data-wi="${i}">
+        Week ${i+1}
+        <input type="text" class="wk-date-input" data-wi="${i}" placeholder="date" value="${escapeAttr(w.date)}">
+        ${w.note ? `<span class="wk-note">${escapeHtml(w.note)}</span>` : ''}
+      </th>
+    `).join('');
+
+  const body = document.getElementById('bodyRows');
+  body.innerHTML = SUBJECTS.map(subject=>{
+    const cells = c.weeks.map((w,wi)=>{
+      const text = c.cells[cellKey(subject,wi)] || "";
+      const cls = text ? "cell-inner filled" : "cell-inner empty";
+      const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+      let hint = "";
+      if(subject === "Literacy – Spelling/Phonics") hint = phonicsHint(globalWeek);
+      if(subject === "Literacy – Handwriting") hint = handwritingHint(globalWeek);
+      if(subject === "P.E") hint = peHint(globalWeek);
+      const hintHtml = hint ? `<span class="week-hint">${escapeHtml(hint)}</span>` : "";
+      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(truncate(text,70)) : "+ add"}${hintHtml}</div></td>`;
+    }).join('');
+    return `<tr>
+      <td class="subject-cell">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  document.querySelectorAll('.cell-inner').forEach(el=>{
+    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
+  });
+  document.querySelectorAll('.bank-link').forEach(el=>{
+    el.addEventListener('click', ()=>openBankManager(el.dataset.subject));
+  });
+  document.querySelectorAll('.wk-date-input').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      cur().weeks[parseInt(el.dataset.wi)].date = el.value;
+      persist();
+    });
+  });
+}
+
+function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escapeAttr(s){ return escapeHtml(s); }
+
+function openCellEditor(subject, wi){
+  activeCell = {subject, wi};
+  document.getElementById('cellModalTitle').textContent = `${subject} · Week ${wi+1}`;
+  document.getElementById('cellModalDate').textContent = cur().weeks[wi].date;
+  document.getElementById('cellText').value = cur().cells[cellKey(subject,wi)] || "";
+  renderChips(subject);
+
+  const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+  let progHint = "";
+  if(subject === "Literacy – Spelling/Phonics") progHint = phonicsHint(globalWeek);
+  if(subject === "Literacy – Handwriting") progHint = handwritingHint(globalWeek);
+  if(subject === "P.E") progHint = peHint(globalWeek);
+  const progBox = document.getElementById('weekProgramBox');
+  if(progHint){
+    progBox.style.display = "block";
+    progBox.innerHTML = `<div class="bank-title">This week's programme</div>
+      <span class="chip" id="weekProgramChip">${escapeHtml(progHint)}</span>`;
+    document.getElementById('weekProgramChip').addEventListener('click', ()=>{
+      const ta = document.getElementById('cellText');
+      ta.value = ta.value ? ta.value + "\n" + progHint : progHint;
+    });
+  }else{
+    progBox.style.display = "none";
+    progBox.innerHTML = "";
+  }
+
+  const linkBox = document.getElementById('linkedTopicsBox');
+  if(subject === LISTENING_SUBJECT){
+    const bgeText = cur().cells[cellKey(BGE_SUBJECT, wi)] || "";
+    const writingText = cur().cells[cellKey(WRITING_SUBJECT, wi)] || "";
+    let html = '<div class="bank-title">Linked to this week</div>';
+    if(bgeText){
+      html += `<div class="linked-item"><strong>BGE topic:</strong> <span class="chip link-chip" data-insert="${escapeAttr(bgeText)}">${escapeHtml(truncate(bgeText,80))}</span></div>`;
+    }else{
+      html += `<div class="linked-empty">BGE (RME/Expressive Arts/Sciences/Social Studies/Technologies) not yet planned for this week.</div>`;
+    }
+    if(writingText){
+      html += `<div class="linked-item"><strong>Writing focus:</strong> <span class="chip link-chip" data-insert="${escapeAttr(writingText)}">${escapeHtml(truncate(writingText,80))}</span></div>`;
+    }else{
+      html += `<div class="linked-empty">Writing not yet planned for this week.</div>`;
+    }
+    linkBox.style.display = "block";
+    linkBox.innerHTML = html;
+    linkBox.querySelectorAll('.link-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const ta = document.getElementById('cellText');
+        const val = chip.dataset.insert;
+        ta.value = ta.value ? ta.value + "\n" + val : val;
+      });
+    });
+  }else{
+    linkBox.style.display = "none";
+    linkBox.innerHTML = "";
+  }
+
+  document.getElementById('aiContext').value = "";
+  document.getElementById('aiChips').innerHTML = "";
+  document.getElementById('aiStatus').textContent = "";
+  document.getElementById('cellOverlay').classList.add('open');
+  document.getElementById('cellText').focus();
+}
+function renderChips(subject){
+  const bank = state.banks[subject] || [];
+  const wrap = document.getElementById('cellChips');
+  const none = document.getElementById('noChips');
+  if(bank.length===0){
+    wrap.innerHTML = "";
+    none.style.display = "block";
+    return;
+  }
+  none.style.display = "none";
+  wrap.innerHTML = bank.map(item=>`<span class="chip" data-id="${item.id}">${escapeHtml(truncate(item.text,60))}</span>`).join('');
+  wrap.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const item = bank.find(b=>b.id===chip.dataset.id);
+      const ta = document.getElementById('cellText');
+      ta.value = ta.value ? ta.value + "\n" + item.text : item.text;
+    });
+  });
+}
+
+async function getAiSuggestions(){
+  const subject = activeCell.subject;
+  const wi = activeCell.wi;
+  const c = cur();
+  const contextInput = document.getElementById('aiContext').value.trim();
+  const bank = state.banks[subject] || [];
+  const statusEl = document.getElementById('aiStatus');
+  const chipsEl = document.getElementById('aiChips');
+
+  const priorEntries = c.weeks.map((w,i)=>c.cells[cellKey(subject,i)])
+    .map((t,i)=> t ? `Week ${i+1}: ${t}` : null)
+    .filter(Boolean);
+
+  let linkedContext = "";
+  if(subject === LISTENING_SUBJECT){
+    const bgeText = c.cells[cellKey(BGE_SUBJECT, wi)] || "";
+    const writingText = c.cells[cellKey(WRITING_SUBJECT, wi)] || "";
+    if(bgeText || writingText){
+      linkedContext = "\nTie this week's Listening & Talking to what's already planned this week where sensible:\n" +
+        (bgeText ? `- This week's BGE topic: ${bgeText}\n` : "") +
+        (writingText ? `- This week's Writing focus: ${writingText}\n` : "");
+    }
+  }
+
+  statusEl.textContent = "Thinking…";
+  chipsEl.innerHTML = "";
+
+  const bankList = bank.length
+    ? bank.map(b=>`- ${b.text}`).join("\n")
+    : "(no saved curricular areas for this subject yet)";
+
+  const prompt = `You are helping a Scottish primary teacher plan a ten-week curriculum overview under Curriculum for Excellence (CfE).
+
+Class: ${c.className || "P2"} (Early Level / First Level, CfE)
+Subject / curricular area lane: ${subject}
+Week being planned: Week ${wi+1} of 10${c.weeks[wi].date ? " (" + c.weeks[wi].date + ")" : ""}
+${contextInput ? "Teacher's note on this week's focus: " + contextInput : "No specific focus given — infer something sensible and age-appropriate."}
+${linkedContext}
+Curricular areas already saved in this subject's bank (reuse or adapt these if suitable, to keep consistency with the teacher's plans):
+${bankList}
+
+Entries already planned for other weeks in this subject (avoid repeating the same outcome week to week, and suggest sensible progression):
+${priorEntries.length ? priorEntries.join("\n") : "(none yet)"}
+
+Suggest 3 short options for what to put in this week's cell. Each should be a concise curricular area / experience & outcome + a brief learning intention, suitable for a CfE Early/First Level ${subject} lesson focus, written the way a teacher would jot it in a planner (not a full CfE code unless it aids clarity).
+
+Respond ONLY with valid JSON, no markdown fences, no preamble, in this exact shape:
+[{"suggestion":"..."},{"suggestion":"..."},{"suggestion":"..."}]`;
+
+  try{
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{role: "user", content: prompt}]
+      })
+    });
+    const data = await response.json();
+
+    if(data.error){
+      throw new Error(data.error.message || "API error");
+    }
+    const textBlock = (data.content || []).find(b=>b.type==="text");
+    if(!textBlock || !textBlock.text){
+      throw new Error("Empty response from model");
+    }
+
+    let clean = textBlock.text.replace(/```json|```/g, "").trim();
+    // Fallback: if the model added any preamble/postamble, grab just the [...] array
+    const arrMatch = clean.match(/\[[\s\S]*\]/);
+    if(arrMatch) clean = arrMatch[0];
+
+    const suggestions = JSON.parse(clean);
+    if(!Array.isArray(suggestions) || suggestions.length===0){
+      throw new Error("No suggestions returned");
+    }
+
+    statusEl.textContent = "Tap a suggestion to insert it:";
+    chipsEl.innerHTML = suggestions.map((s,i)=>
+      `<span class="chip ai-chip" data-i="${i}">${escapeHtml(truncate(s.suggestion,80))}</span>`
+    ).join('');
+    chipsEl.querySelectorAll('.chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const s = suggestions[parseInt(chip.dataset.i)];
+        const ta = document.getElementById('cellText');
+        ta.value = ta.value ? ta.value + "\n" + s.suggestion : s.suggestion;
+      });
+    });
+  }catch(e){
+    console.error("AI suggestion error:", e);
+    statusEl.textContent = "Couldn't get suggestions: " + (e.message || "unknown error") + ". Try again.";
+  }
+}
+document.getElementById('aiSuggestBtn').addEventListener('click', getAiSuggestions);
+document.getElementById('cellCancel').addEventListener('click', ()=>{
+  document.getElementById('cellOverlay').classList.remove('open');
+});
+document.getElementById('cellSave').addEventListener('click', ()=>{
+  const text = document.getElementById('cellText').value.trim();
+  const key = cellKey(activeCell.subject, activeCell.wi);
+  if(text) cur().cells[key] = text; else delete cur().cells[key];
+  persist();
+  render();
+  document.getElementById('cellOverlay').classList.remove('open');
+});
+document.getElementById('manageBankBtn').addEventListener('click', ()=>{
+  document.getElementById('cellOverlay').classList.remove('open');
+  openBankManager(activeCell.subject);
+});
+
+function openBankManager(subject){
+  activeBankSubject = subject;
+  document.getElementById('bankModalTitle').textContent = `Bank · ${subject}`;
+  renderBankList();
+  document.getElementById('bankNewText').value = "";
+  document.getElementById('bankOverlay').classList.add('open');
+}
+function renderBankList(){
+  const bank = state.banks[activeBankSubject] || [];
+  document.getElementById('bankCount').textContent = `${bank.length} saved`;
+  const list = document.getElementById('bankList');
+  if(bank.length===0){
+    list.innerHTML = '<div class="empty-state">Nothing saved yet. Paste in curricular areas from your school plans below — you\'ll be able to quick-insert them into any week.</div>';
+    return;
+  }
+  list.innerHTML = bank.map(item=>`
+    <div class="bank-item">
+      <span>${escapeHtml(item.text)}</span>
+      <button data-id="${item.id}" title="Remove">×</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.banks[activeBankSubject] = state.banks[activeBankSubject].filter(b=>b.id!==btn.dataset.id);
+      persist();
+      renderBankList();
+    });
+  });
+}
+document.getElementById('bankAddBtn').addEventListener('click', ()=>{
+  const ta = document.getElementById('bankNewText');
+  const text = ta.value.trim();
+  if(!text) return;
+  if(!state.banks[activeBankSubject]) state.banks[activeBankSubject] = [];
+  state.banks[activeBankSubject].push({id: 'b'+Date.now()+Math.random().toString(36).slice(2,7), text});
+  ta.value = "";
+  persist();
+  renderBankList();
+});
+document.getElementById('bankClose').addEventListener('click', ()=>{
+  document.getElementById('bankOverlay').classList.remove('open');
+  if(activeCell) renderChips(activeCell.subject);
+  render();
+});
+
+document.getElementById('cycleTitle').addEventListener('change', e=>{ cur().cycleTitle = e.target.value; persist(); });
+document.getElementById('className').addEventListener('change', e=>{ cur().className = e.target.value; persist(); });
+
+document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+
+document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
+  let added = 0;
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, RME_SEED, BUNDLE2_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  allSeeds.forEach(seed=>{
+    Object.keys(seed).forEach(subject=>{
+      if(!state.banks[subject]) state.banks[subject] = [];
+      const existingTexts = new Set(state.banks[subject].map(b=>b.text));
+      seed[subject].forEach(text=>{
+        if(!existingTexts.has(text)){
+          state.banks[subject].push({id:'b'+Date.now()+Math.random().toString(36).slice(2,7), text});
+          added++;
+        }
+      });
+    });
+  });
+  persist();
+  render();
+  alert(added > 0
+    ? `Added ${added} outcomes across your subject banks (Literacy, Numeracy, Mathematics, RME, Expressive Arts, Sciences, Social Studies, Technologies, 1+2).`
+    : "Your subject banks already have all of this content.");
+});
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm("Clear every week's entries for this cycle? Your curricular area banks will be kept.")){
+    cur().cells = {};
+    persist();
+    render();
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const c = cur();
+  let out = `${c.cycleTitle} — ${c.className}\n\n`;
+  SUBJECTS.forEach(subject=>{
+    out += subject + "\n";
+    c.weeks.forEach((w,wi)=>{
+      const text = c.cells[cellKey(subject,wi)];
+      if(text) out += `  Week ${wi+1} (${w.date}): ${text}\n`;
+    });
+    out += "\n";
+  });
+  const blob = new Blob([out], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `cycle-${state.activeCycle}-planner.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+/* ============ RESOURCE BANK ============ */
+const RES_STORAGE_KEY = "hub-resources-state";
+const RES_SUBJECTS = ["General"].concat(SUBJECTS);
+let resources = [];
+let activeResourceId = null;
+const resSaveStatus = document.getElementById('resSaveStatus');
+
+// populate subject dropdowns
+document.getElementById('resSubject').innerHTML = RES_SUBJECTS.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
+document.getElementById('resSubjectFilter').innerHTML =
+  '<option value="">All subjects</option>' + RES_SUBJECTS.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
+
+let resSaveTimer = null;
+function persistResources(){
+  resSaveStatus.textContent = "Saving…";
+  clearTimeout(resSaveTimer);
+  resSaveTimer = setTimeout(async ()=>{
+    try{
+      await cloudStorage.set(RES_STORAGE_KEY, JSON.stringify(resources));
+      resSaveStatus.textContent = "Saved";
+    }catch(e){
+      resSaveStatus.textContent = "Couldn't save — check connection";
+    }
+  }, 250);
+}
+
+async function loadResources(){
+  try{
+    const res = await cloudStorage.get(RES_STORAGE_KEY);
+    if(res && res.value) resources = JSON.parse(res.value);
+    resSaveStatus.textContent = "Synced";
+  }catch(e){
+    resSaveStatus.textContent = "Starting fresh";
+  }
+  renderResources();
+}
+
+function renderResources(){
+  const search = document.getElementById('resSearch').value.trim().toLowerCase();
+  const subjectFilter = document.getElementById('resSubjectFilter').value;
+  const grid = document.getElementById('resGrid');
+  const empty = document.getElementById('resEmpty');
+
+  let list = resources.slice().sort((a,b)=> (a.title||"").localeCompare(b.title||""));
+  if(subjectFilter) list = list.filter(r=>r.subject===subjectFilter);
+  if(search) list = list.filter(r=>{
+    const hay = [r.title, r.notes, (r.tags||[]).join(' ')].join(' ').toLowerCase();
+    return hay.includes(search);
+  });
+
+  if(list.length===0){
+    grid.innerHTML = "";
+    empty.style.display = "block";
+    empty.textContent = resources.length===0
+      ? 'No resources saved yet — click "+ Add resource" to start building your bank.'
+      : "No resources match your search/filter.";
+    return;
+  }
+  empty.style.display = "none";
+
+  grid.innerHTML = list.map(r=>`
+    <div class="res-card" data-id="${r.id}">
+      <span class="res-type">${escapeHtml(r.type||"Other")}</span>
+      <h3>${escapeHtml(r.title||"Untitled")}</h3>
+      <span class="res-subject">${escapeHtml(r.subject||"General")}</span>
+      ${r.notes ? `<p>${escapeHtml(truncate(r.notes,140))}</p>` : ""}
+      ${(r.tags && r.tags.length) ? `<span class="res-tags">${r.tags.map(t=>'#'+escapeHtml(t)).join(' ')}</span>` : ""}
+      <div class="res-actions">
+        ${r.url ? `<a class="res-link" href="${escapeAttr(r.url)}" target="_blank" rel="noopener">Open link</a>` : ""}
+        <button class="btn-ghost res-edit" data-id="${r.id}">Edit</button>
+      </div>
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.res-edit').forEach(btn=>{
+    btn.addEventListener('click', ()=>openResourceEditor(btn.dataset.id));
+  });
+}
+
+document.getElementById('resSearch').addEventListener('input', renderResources);
+document.getElementById('resSubjectFilter').addEventListener('change', renderResources);
+
+function openResourceEditor(id){
+  activeResourceId = id || null;
+  const r = id ? resources.find(x=>x.id===id) : null;
+  document.getElementById('resModalTitle').textContent = r ? "Edit resource" : "Add resource";
+  document.getElementById('resTitle').value = r ? r.title : "";
+  document.getElementById('resSubject').value = r ? r.subject : "General";
+  document.getElementById('resType').value = r ? r.type : "Worksheet";
+  document.getElementById('resUrl').value = r ? (r.url||"") : "";
+  document.getElementById('resNotes').value = r ? (r.notes||"") : "";
+  document.getElementById('resTags').value = r ? (r.tags||[]).join(', ') : "";
+  document.getElementById('resDeleteBtn').style.display = r ? "inline-block" : "none";
+  document.getElementById('resOverlay').classList.add('open');
+  document.getElementById('resTitle').focus();
+}
+document.getElementById('addResourceBtn').addEventListener('click', ()=>openResourceEditor(null));
+document.getElementById('resCancel').addEventListener('click', ()=>{
+  document.getElementById('resOverlay').classList.remove('open');
+});
+document.getElementById('resSave').addEventListener('click', ()=>{
+  const title = document.getElementById('resTitle').value.trim();
+  if(!title){ alert("Give the resource a title."); return; }
+  const data = {
+    title,
+    subject: document.getElementById('resSubject').value,
+    type: document.getElementById('resType').value,
+    url: document.getElementById('resUrl').value.trim(),
+    notes: document.getElementById('resNotes').value.trim(),
+    tags: document.getElementById('resTags').value.split(',').map(t=>t.trim()).filter(Boolean)
+  };
+  if(activeResourceId){
+    const idx = resources.findIndex(r=>r.id===activeResourceId);
+    resources[idx] = Object.assign(resources[idx], data);
+  }else{
+    resources.push(Object.assign({id:'r'+Date.now()+Math.random().toString(36).slice(2,7)}, data));
+  }
+  persistResources();
+  renderResources();
+  document.getElementById('resOverlay').classList.remove('open');
+});
+document.getElementById('resDeleteBtn').addEventListener('click', ()=>{
+  if(!activeResourceId) return;
+  if(confirm("Delete this resource?")){
+    resources = resources.filter(r=>r.id!==activeResourceId);
+    persistResources();
+    renderResources();
+    document.getElementById('resOverlay').classList.remove('open');
+  }
+});
+
+/* ============ Init ============ */
+if(syncKey){
+  loadState();
+  loadResources();
+}
+</script>
+</body>
+</html>
