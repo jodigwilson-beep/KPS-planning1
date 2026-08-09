@@ -45,7 +45,11 @@ exports.handler = async (event) => {
       };
     }
     if (event.httpMethod === 'POST') {
-      const body = JSON.parse(event.body || '{}');
+      let bodyStr = event.body || '{}';
+      if (event.isBase64Encoded) {
+        bodyStr = Buffer.from(bodyStr, 'base64').toString('utf8');
+      }
+      const body = JSON.parse(bodyStr);
       await store.set(blobKey, body.value);
       return {
         statusCode: 200,
