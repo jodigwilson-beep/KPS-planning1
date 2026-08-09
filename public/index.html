@@ -4,20 +4,20 @@
 <meta charset="UTF-8">
 <title>Teaching Hub</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,500;0,600;0,700;1,500&family=Atkinson+Hyperlegible:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:ital,wght@0,400;0,700;1,600&display=swap');
 
   :root{
     --paper: #FAF7F0;
     --paper-line: #E4DCC8;
     --ink: #2E3B32;
-    --board: #2C4A3E;
-    --board-light: #3E6152;
+    --board: #12875C;
+    --board-light: #17A873;
     --chalk: #F5EFDC;
-    --ochre: #B8863B;
-    --ochre-soft: #EFE1C4;
-    --blue: #4C6E85;
-    --blue-soft: #E1ECF1;
-    --danger: #A6503B;
+    --ochre: #E8952D;
+    --ochre-soft: #FDE3B8;
+    --blue: #1E90C9;
+    --blue-soft: #D2EDFA;
+    --danger: #E0492E;
     --radius: 10px;
   }
   *{box-sizing:border-box;}
@@ -25,12 +25,12 @@
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-family:'Nunito', sans-serif;
     font-size:14px;
     line-height:1.4;
   }
   button{
-    font-family:'Atkinson Hyperlegible', sans-serif;
+    font-family:'Nunito', sans-serif;
     font-size:13px;
     cursor:pointer;
     border-radius:7px;
@@ -51,7 +51,7 @@
     padding:22px 14px; position:sticky; top:0; height:100vh; overflow-y:auto;
   }
   .hub-brand{
-    font-family:'Newsreader', serif; font-weight:700; font-size:19px;
+    font-family:'Quicksand', sans-serif; font-weight:700; font-size:19px;
     margin:0 8px 22px; letter-spacing:0.2px;
   }
   .nav-link{
@@ -75,7 +75,7 @@
 
   /* ===== Home view ===== */
   .home-hero{margin-bottom:26px;}
-  .home-hero h1{font-family:'Newsreader',serif; font-size:26px; margin:0 0 6px; color:var(--board);}
+  .home-hero h1{font-family:'Quicksand',sans-serif; font-size:26px; margin:0 0 6px; color:var(--board);}
   .home-hero p{color:#6B6252; margin:0; max-width:560px;}
   .tool-cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
   .tool-card{
@@ -84,7 +84,7 @@
     border-top:4px solid var(--ochre);
   }
   .tool-card:hover{box-shadow:0 6px 18px rgba(44,74,62,0.1);}
-  .tool-card h2{font-family:'Newsreader',serif; font-size:18px; margin:0; color:var(--board);}
+  .tool-card h2{font-family:'Quicksand',sans-serif; font-size:18px; margin:0; color:var(--board);}
   .tool-card p{margin:0; font-size:13px; color:#6B6252;}
   .tool-card .go{font-size:12px; font-weight:700; color:var(--ochre);}
   .tool-card.resources{border-top-color:var(--blue);}
@@ -100,11 +100,11 @@
     background-image:repeating-linear-gradient(transparent, transparent 27px, rgba(245,239,220,0.06) 28px);
     pointer-events:none;
   }
-  header h1{font-family:'Newsreader', serif; font-weight:700; font-size:24px; margin:0 0 4px;}
+  header h1{font-family:'Quicksand', sans-serif; font-weight:700; font-size:24px; margin:0 0 4px;}
   header .meta{display:flex; gap:18px; flex-wrap:wrap; align-items:baseline; margin-top:10px;}
   header input[type=text]{
     background:transparent; border:none; border-bottom:1px solid rgba(245,239,220,0.4);
-    color:var(--chalk); font-family:'Newsreader', serif; font-size:24px; font-weight:700;
+    color:var(--chalk); font-family:'Quicksand', sans-serif; font-size:24px; font-weight:700;
     padding:2px 0; width:min(560px, 90%);
   }
   header input[type=text]:focus{outline:none; border-bottom-color:var(--ochre);}
@@ -112,7 +112,7 @@
   .cycle-field label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; opacity:0.75;}
   .cycle-field input{
     background:rgba(245,239,220,0.08); border:1px solid rgba(245,239,220,0.25); color:var(--chalk);
-    border-radius:6px; padding:5px 8px; font-family:'Atkinson Hyperlegible', sans-serif;
+    border-radius:6px; padding:5px 8px; font-family:'Nunito', sans-serif;
     font-size:13px; width:90px;
   }
 
@@ -123,18 +123,18 @@
     cursor:pointer; border-bottom:none; position:relative; top:1px; opacity:0.65;
   }
   .cycle-tab.active{opacity:1; color:#fff;}
-  .cycle-tab[data-n="1"].active{background:#C89B2E; border-color:#C89B2E;}
-  .cycle-tab[data-n="2"].active{background:#C46A2E; border-color:#C46A2E;}
-  .cycle-tab[data-n="3"].active{background:#C2597A; border-color:#C2597A;}
-  .cycle-tab[data-n="4"].active{background:#4A8A5C; border-color:#4A8A5C;}
-  header.c1{background:#C89B2E;}
-  header.c2{background:#C46A2E;}
-  header.c3{background:#C2597A;}
-  header.c4{background:#4A8A5C;}
-  table.c1 thead th, table.c1 thead th.subject-head{background:#C89B2E;}
-  table.c2 thead th, table.c2 thead th.subject-head{background:#C46A2E;}
-  table.c3 thead th, table.c3 thead th.subject-head{background:#C2597A;}
-  table.c4 thead th, table.c4 thead th.subject-head{background:#4A8A5C;}
+  .cycle-tab[data-n="1"].active{background:#F5B400; border-color:#F5B400;}
+  .cycle-tab[data-n="2"].active{background:#F2701C; border-color:#F2701C;}
+  .cycle-tab[data-n="3"].active{background:#EE4D82; border-color:#EE4D82;}
+  .cycle-tab[data-n="4"].active{background:#22B14C; border-color:#22B14C;}
+  header.c1{background:#F5B400;}
+  header.c2{background:#F2701C;}
+  header.c3{background:#EE4D82;}
+  header.c4{background:#22B14C;}
+  table.c1 thead th, table.c1 thead th.subject-head{background:#F5B400;}
+  table.c2 thead th, table.c2 thead th.subject-head{background:#F2701C;}
+  table.c3 thead th, table.c3 thead th.subject-head{background:#EE4D82;}
+  table.c4 thead th, table.c4 thead th.subject-head{background:#22B14C;}
 
   .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
 
@@ -142,11 +142,11 @@
   table{border-collapse:collapse; width:100%; min-width:1180px;}
   thead th{
     position:sticky; top:0; z-index:3; background:var(--board); color:var(--chalk);
-    font-family:'Newsreader', serif; font-weight:600; text-align:left; padding:10px 10px;
+    font-family:'Quicksand', sans-serif; font-weight:600; text-align:left; padding:10px 10px;
     font-size:13px; border-right:1px solid rgba(245,239,220,0.15);
   }
-  thead th .wk-date{display:block; font-family:'Atkinson Hyperlegible',sans-serif; font-weight:400; font-size:11px; opacity:0.8; margin-top:2px;}
-  thead th .wk-note{display:block; font-family:'Atkinson Hyperlegible',sans-serif; font-weight:700; font-size:10px; color:var(--ochre); margin-top:3px;}
+  thead th .wk-date{display:block; font-family:'Nunito',sans-serif; font-weight:400; font-size:11px; opacity:0.8; margin-top:2px;}
+  thead th .wk-note{display:block; font-family:'Nunito',sans-serif; font-weight:700; font-size:10px; color:var(--ochre); margin-top:3px;}
   thead th input{background:transparent; border:none; color:inherit; font:inherit; width:100%; padding:0;}
   thead th.subject-head{position:sticky; left:0; z-index:4; min-width:190px; background:var(--board);}
   td.subject-cell{
@@ -182,7 +182,7 @@
     display:flex; flex-direction:column; box-shadow:0 12px 40px rgba(0,0,0,0.25);
   }
   .modal-head{padding:16px 20px; border-bottom:1px solid var(--paper-line); display:flex; justify-content:space-between; align-items:baseline;}
-  .modal-head h2{font-family:'Newsreader',serif; font-size:17px; margin:0; color:var(--board);}
+  .modal-head h2{font-family:'Quicksand',sans-serif; font-size:17px; margin:0; color:var(--board);}
   .modal-head span{font-size:12px; color:var(--blue);}
   .modal-body{padding:16px 20px; overflow-y:auto;}
   .modal-body textarea{width:100%; min-height:90px; resize:vertical; border:1px solid var(--paper-line); border-radius:7px; padding:9px; font-family:inherit; font-size:13px; color:var(--ink);}
@@ -229,7 +229,7 @@
     align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase;
     letter-spacing:0.05em; background:var(--blue-soft); color:var(--blue); padding:3px 8px; border-radius:10px;
   }
-  .res-card h3{font-family:'Newsreader',serif; font-size:16px; margin:2px 0 0; color:var(--board);}
+  .res-card h3{font-family:'Quicksand',sans-serif; font-size:16px; margin:2px 0 0; color:var(--board);}
   .res-card .res-subject{font-size:11.5px; color:var(--ochre); font-weight:700;}
   .res-card p{font-size:12.5px; color:#5C5648; margin:2px 0 0; white-space:pre-wrap;}
   .res-card .res-tags{font-size:11px; color:var(--blue); margin-top:2px;}
@@ -286,6 +286,7 @@
         <button class="btn-ghost" id="printBtn">Print view</button>
         <button class="btn-ghost" id="resetBtn">Clear all entries</button>
         <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
+        <button class="btn-ghost" id="loadCycle1Btn">Load full year plan (all 4 cycles)</button>
         <span class="save-status" id="saveStatus">Loading…</span>
       </div>
 
@@ -784,6 +785,266 @@ const HANDWRITING_PLAN = {
   32:"ay ey", 33:"ip up", 34:"ib ub", 35:"Consolidation & Assessment",
   36:"th ck", 37:"ch ent", 38:"ant till", 39:"Consolidation & Assessment", 40:"Consolidation & Assessment"
 };
+/* Cycle 1 (10 weeks, Aug-Nov 2026) — Toy Detectives / Magnets topic, from the teacher's actual planning doc */
+const CYCLE1_WEEKS = [
+  {date:"17/8/26", note:"3 day week"},
+  {date:"24/8/26", note:""},
+  {date:"31/8/26", note:""},
+  {date:"7/9/26", note:""},
+  {date:"14/9/26", note:""},
+  {date:"21/9/26", note:""},
+  {date:"28/9/26", note:""},
+  {date:"5/10/26", note:"*end of T1"},
+  {date:"26/10/26", note:"*start of T2"},
+  {date:"2/11/26", note:""}
+];
+const CYCLE1_CELLS = {
+  "Literacy – Writing": [
+    "I can write labels for the toys I am exploring.",
+    "I can write simple sentences about how a toy moves.",
+    "I can record my predictions in writing.",
+    "I can write factual sentences about magnets. (LIT 1-25a)",
+    "I can make notes about my investigation.",
+    "I can write about what I found out. (LIT 1-25a)",
+    "I can write a simple plan for my toy design.",
+    "I can label my toy design with materials used.",
+    "I can write about the changes I made to my toy.",
+    "I can write simple non-fiction facts about my toy. (ENG 1-31a)"
+  ],
+  "Literacy – Reading": [
+    "I can look at pictures in a toy book and talk about what I see.",
+    "I can find information from diagrams about how toys move. (LIT 1-15a)",
+    "I can use a non-fiction text to find out about forces.",
+    "I can find information about magnets from a book. (LIT 1-14a)",
+    "I can use contents/index to locate information about magnets.",
+    "I can read simple instructions for a game.",
+    "I can read instructions to help me build my toy.",
+    "I can follow written instructions independently.",
+    "I can read back my notes to check my understanding.",
+    "I can read my writing aloud to share with others."
+  ],
+  "Literacy – Listening and Talking": [
+    "I can listen to instructions and follow them to explore toys safely.",
+    "I can ask questions about what I am finding out.",
+    "I can share my ideas about why toys move the way they do.",
+    "I can listen carefully to others' predictions about magnets.",
+    "I can talk about what I have learned from my investigation. (LIT 1-04a)",
+    "I can explain my thinking to a partner.",
+    "I can ask questions to help me understand a design problem. (LIT 1-09a)",
+    "I can give and receive feedback on my toy design.",
+    "I can talk about the improvements I have made.",
+    "I can present my toy and explain how it works."
+  ],
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "RME: I can listen to the story of Noah and talk about what happens. (RME 1-01a)\nBGE (Toy Detectives): I can explore a range of toys and predict how they move.",
+    "RME: I can retell the story of Noah in my own words.\nBGE: I can investigate how pushes and pulls affect movement. (SCN 1-07a)",
+    "RME: I can talk about the message of the story of Noah.\nBGE: I can test toys and record what forces are involved.",
+    "RME: I can listen to the story of Jonah and the Whale. (RME 1-01b)\nBGE: I can explore magnets and predict what they attract.",
+    "RME: I can retell the story of Jonah and the Whale.\nBGE: I can investigate how magnets affect materials. (SCN 1-08a)",
+    "RME: I can talk about the message of Jonah and the Whale.\nBGE: I can use my findings about magnets to help design a game.",
+    "RME: I can talk about my own beliefs. (RME 1-01c)\nBGE: I can choose materials to design my own toy. (EXA 1-06a)",
+    "RME: I can talk about ways I can express my beliefs.\nBGE: I can use tools and equipment to build my toy. (TCH 1-04b)",
+    "RME: I can compare the two stories I have learned about.\nBGE: I can test and improve my toy design. (TCH 1-04c)",
+    "RME: I can share what I have learned about Bible stories.\nBGE: I can share my toy and explain how it works."
+  ]
+};
+
+const CYCLE2_WEEKS = [
+  {date:"9/11/26", note:"*13/11 Inservice"},
+  {date:"16/11/26", note:""},
+  {date:"23/11/26", note:""},
+  {date:"30/11/26", note:""},
+  {date:"7/12/26", note:""},
+  {date:"14/12/26", note:""},
+  {date:"21/12/26", note:"*T2 ends 22/12"},
+  {date:"4/1/27", note:"*T3 starts 5/1"},
+  {date:"11/1/27", note:""},
+  {date:"18/1/27", note:""}
+];
+const CYCLE2_CELLS = {
+  "Literacy – Writing": [
+    "I can write words to describe ice and snow.",
+    "I can write a simple sentence about an Arctic animal.",
+    "I can use descriptive language to write about the Arctic. (ENG 1-31a)",
+    "I can write a simple character description. (LIT 1-30a)",
+    "I can write a simple setting description.",
+    "I can plan a short story about an Arctic adventure.",
+    "I can write the beginning of my Arctic story.",
+    "I can write the script for my drama performance.",
+    "I can edit and improve my writing with help.",
+    "I can write about how I felt performing my Arctic piece."
+  ],
+  "Literacy – Reading": [
+    "I can look at pictures in Arctic-themed books and talk about what I see.",
+    "I can retell the main events of an Arctic story. (LIT 1-16a)",
+    "I can read Arctic poems and talk about how they make me feel.",
+    "I can find information from an Arctic non-fiction book.",
+    "I can compare fiction and non-fiction Arctic texts.",
+    "I can read a short story and identify the characters. (LIT 1-16a)",
+    "I can read a script with expression.",
+    "I can read my group's script aloud.",
+    "I can read for enjoyment during Arctic reading time. (LIT 1-11a)",
+    "I can share my favourite Arctic book with others."
+  ],
+  "Literacy – Listening and Talking": [
+    "I can listen to and respond to Arctic-themed stories. (LIT 1-09a)",
+    "I can talk about how the ice and snow make me feel.",
+    "I can use my voice clearly during dance and drama. (LIT 1-03a)",
+    "I can talk about the sounds I hear in Arctic music.",
+    "I can share my ideas about Arctic sounds with others.",
+    "I can listen carefully to my group during drama planning.",
+    "I can use expression when performing.",
+    "I can talk about the story of my drama piece.",
+    "I can give feedback to others on their performance.",
+    "I can talk about what I enjoyed about my performance."
+  ],
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "RME: I can listen to the Nativity story and talk about key figures. (RME 1-03b)\nBGE (Arctic Explorers): I can explore movement and use my body to represent ice and snow. (EXA 1-10a)",
+    "RME: I can retell part of the Nativity story.\nBGE: I can practise dance steps and formations inspired by the Arctic. (EXA 1-10a)",
+    "RME: I can talk about how Christians celebrate Christmas.\nBGE: I can perform a short dance about the Arctic.",
+    "RME: I can compare the Nativity story with my own family celebrations.\nBGE: I can use my voice and instruments to create Arctic sounds. (EXA 1-17a)",
+    "RME: I can listen to the story of Hanukkah. (RME 1-04a)\nBGE: I can explore music technology to create an Arctic soundscape.",
+    "RME: I can talk about the Festival of Light and why it is celebrated.\nBGE: I can use drama to explore an Arctic adventure story. (EXA 1-13a)",
+    "RME: I can compare Christmas and Hanukkah celebrations.\nBGE: I can use improvisation to create an Arctic scene. (EXA 1-14a)",
+    "RME: I can talk about my own family's winter celebrations.\nBGE: I can develop a short script for an Arctic story. (EXA 1-14a)",
+    "RME: I can describe similarities between different winter festivals.\nBGE: I can rehearse my performance with my group.",
+    "RME: I can share what I have learned about winter celebrations.\nBGE: I can perform my Arctic piece to an audience."
+  ]
+};
+
+const CYCLE3_WEEKS = [
+  {date:"25/1/27", note:""},
+  {date:"1/2/27", note:"*5/2 Holiday"},
+  {date:"8/2/27", note:"*2 day week"},
+  {date:"15/2/27", note:""},
+  {date:"22/2/27", note:""},
+  {date:"1/3/27", note:""},
+  {date:"8/3/27", note:""},
+  {date:"15/3/27", note:""},
+  {date:"22/3/27", note:"*end of T3 (4 day week)"},
+  {date:"12/4/27", note:""}
+];
+const CYCLE3_CELLS = {
+  "Literacy – Writing": [
+    "I can write down my ideas about problems I notice.",
+    "I can write a simple sentence about my invention idea.",
+    "I can make notes about my invention plan. (LIT 1-26a)",
+    "I can label a diagram of my invention.",
+    "I can write simple instructions for my program.",
+    "I can write about how computers work.",
+    "I can write a list of materials I need.",
+    "I can write about how I am building my invention.",
+    "I can write about the changes I have made to my invention.",
+    "I can write an explanation of how my invention works. (ENG 1-31a)"
+  ],
+  "Literacy – Reading": [
+    "I can look at pictures of inventions and talk about what I see.",
+    "I can find information about inventors in a book. (LIT 1-14a)",
+    "I can use the contents page to find information about inventions.",
+    "I can read simple instructions for a digital task.",
+    "I can read and follow instructions to build a program.",
+    "I can find information from a book about computers.",
+    "I can read instructions to help me plan my invention.",
+    "I can read instructions to help me build my invention.",
+    "I can read back my notes to check my plan.",
+    "I can read my invention explanation aloud."
+  ],
+  "Literacy – Listening and Talking": [
+    "I can talk about problems I notice in everyday life.",
+    "I can share my invention ideas with a partner.",
+    "I can ask questions to help develop my ideas. (LIT 1-09a)",
+    "I can explain how my program works.",
+    "I can listen to instructions and follow them step by step. (LIT 1-02a)",
+    "I can talk about how computers help us.",
+    "I can explain the choices I have made for my invention.",
+    "I can ask for help when I need it during building.",
+    "I can give feedback to a partner on their invention.",
+    "I can present my invention clearly to an audience. (LIT 1-10a)"
+  ],
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "RME: I can talk about what caring means. (RME 1-09b)\nBGE (Little Inventors' Workshop): I can explore how everyday objects solve problems.",
+    "RME: I can talk about what sharing means.\nBGE: I can identify a problem I would like to solve. (TCH 1-04c)",
+    "RME: I can talk about what fairness means.\nBGE: I can generate ideas for a possible invention.",
+    "RME: I can talk about what equality means.\nBGE: I can use a visual programming language and predict outcomes. (TCH 1-14a)",
+    "RME: I can talk about what love means in my own life.\nBGE: I can build a simple program to carry out a task. (TCH 1-15a)",
+    "RME: I can show caring and sharing during Circle Time.\nBGE: I can explore how computers process information. (TCH 1-14b)",
+    "RME: I can use Decider Skills to solve a problem fairly.\nBGE: I can plan the materials I need for my invention. (TCH 1-04a)",
+    "RME: I can talk about how my values connect to School Values.\nBGE: I can use tools and equipment to build my invention. (TCH 1-04b)",
+    "RME: I can show fairness when working with a partner.\nBGE: I can test my invention and make improvements. (TCH 1-04c)",
+    "RME: I can share an example of how I put my values into action.\nBGE: I can present my invention and explain how it works."
+  ]
+};
+
+const CYCLE4_WEEKS = [
+  {date:"19/4/27", note:""},
+  {date:"26/4/27", note:""},
+  {date:"3/5/27", note:"*3/5 Holiday"},
+  {date:"10/5/27", note:""},
+  {date:"17/5/27", note:""},
+  {date:"24/5/27", note:""},
+  {date:"31/5/27", note:""},
+  {date:"7/6/27", note:"*7/6 Holiday"},
+  {date:"14/6/27", note:""},
+  {date:"21/6/27", note:""}
+];
+const CYCLE4_CELLS = {
+  "Literacy – Writing": [
+    "I can write about my street and local area.",
+    "I can label a simple map of my local area.",
+    "I can write sentences about key places in my community.",
+    "I can write about my own home. (LIT 1-31a)",
+    "I can compare my home with another home in writing.",
+    "I can write about a job in my community.",
+    "I can write questions to ask about a local organisation.",
+    "I can write about ways to look after the environment.",
+    "I can write about ways I can help my community.",
+    "I can write a recount, e.g. 'My Street'. (LIT 1-31a)"
+  ],
+  "Literacy – Reading": [
+    "I can look at photos of my local area and talk about what I see.",
+    "I can find information about my local area in a text. (LIT 1-14a)",
+    "I can read a simple map key.",
+    "I can find information about different homes in a book.",
+    "I can compare information from different texts about housing. (LIT 1-16a)",
+    "I can read about jobs in my community.",
+    "I can find information about local organisations.",
+    "I can read about ways to look after the environment.",
+    "I can read back my notes to check my understanding.",
+    "I can read my writing aloud to share with others."
+  ],
+  "Literacy – Listening and Talking": [
+    "I can talk about my street and my local area.",
+    "I can share ideas with others about my local community. (LIT 1-09a)",
+    "I can ask questions about places in my local area. (LIT 1-02a)",
+    "I can talk about my own home and family.",
+    "I can listen to others talk about their homes.",
+    "I can talk about jobs people do in my community.",
+    "I can ask an adult about their job.",
+    "I can talk about ways to look after my environment.",
+    "I can share my ideas about helping my community.",
+    "I can present what I have learned about my local area."
+  ],
+  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+    "RME: I can listen to a story about Easter and talk about what happens. (RME 1-03b)\nBGE (Our Street, Our Story): I can talk about my local community and the people in it.",
+    "RME: I can retell part of the Easter story.\nBGE: I can create a simple map of my local area. (SOC 1-14a)",
+    "RME: I can talk about the Spring Garden and what it represents.\nBGE: I can identify key places in my local area on a map.",
+    "RME: I can talk about how Christians celebrate Easter.\nBGE: I can talk about different types of housing and how they meet needs. (SOC 1-11a)",
+    "RME: I can compare Easter celebrations with my own family celebrations.\nBGE: I can compare housing in my local area with other places.",
+    "RME: I can talk about values shown in Easter stories.\nBGE: I can talk about jobs in my local community.",
+    "RME: I can identify a value shown in an Easter story. (RME 1-02a)\nBGE: I can talk about local organisations and how they help. (SOC 1-20a)",
+    "RME: I can talk about how I can show these values in my own life.\nBGE: I can talk about ways to look after my local environment. (SOC 1-08a)",
+    "RME: I can compare values across different stories I have learned.\nBGE: I can identify ways I can help my community.",
+    "RME: I can share what I have learned about Easter with others.\nBGE: I can share what I have learned about my local area."
+  ]
+};
+
+const ALL_CYCLES_DATA = {
+  1: {title: "Planning Cycle 1 (10 weeks) — Toy Detectives: What Makes It Go?", weeks: CYCLE1_WEEKS, cells: CYCLE1_CELLS},
+  2: {title: "Planning Cycle 2 (10 weeks) — Arctic Explorers: Survive the Freeze", weeks: CYCLE2_WEEKS, cells: CYCLE2_CELLS},
+  3: {title: "Planning Cycle 3 (10 weeks) — Little Inventors' Workshop", weeks: CYCLE3_WEEKS, cells: CYCLE3_CELLS},
+  4: {title: "Planning Cycle 4 (10 weeks) — Our Street, Our Story", weeks: CYCLE4_WEEKS, cells: CYCLE4_CELLS}
+};
+
 function phonicsHint(week){
   const p = PHONICS_PLAN[week];
   if(!p) return "";
@@ -1223,6 +1484,33 @@ document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   alert(added > 0
     ? `Added ${added} outcomes across your subject banks (Literacy, Numeracy, Mathematics, RME, Expressive Arts, Sciences, Social Studies, Technologies, 1+2).`
     : "Your subject banks already have all of this content.");
+});
+
+document.getElementById('loadCycle1Btn').addEventListener('click', ()=>{
+  const anyExisting = [1,2,3,4].some(n=>{
+    const c = state.cycles[n];
+    return Object.keys(c.cells).some(k =>
+      Object.keys(ALL_CYCLES_DATA[n].cells).some(subj => k.startsWith(subj + "|"))
+    );
+  });
+  if(anyExisting && !confirm("Some cycles already have entries in these subjects — this will overwrite them with the full-year topic plan (Toy Detectives / Arctic Explorers / Little Inventors' Workshop / Our Street, Our Story). Continue?")){
+    return;
+  }
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    const data = ALL_CYCLES_DATA[n];
+    c.cycleTitle = data.title;
+    c.weeks = JSON.parse(JSON.stringify(data.weeks));
+    Object.keys(data.cells).forEach(subject=>{
+      data.cells[subject].forEach((text, wi)=>{
+        c.cells[cellKey(subject, wi)] = text;
+      });
+    });
+  });
+  state.activeCycle = 1;
+  persist();
+  render();
+  alert("All 4 cycles loaded — dates, notes and entries for Writing, Reading, Listening & Talking, and RME/BGE are filled in across the whole year.");
 });
 
 document.getElementById('resetBtn').addEventListener('click', ()=>{
