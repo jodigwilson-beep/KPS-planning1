@@ -33,7 +33,11 @@ exports.handler = async (event) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid data key' }) };
     }
 
-    const store = getStore('teaching-hub');
+    const store = getStore({
+      name: 'teaching-hub',
+      siteID: process.env.BLOBS_SITE_ID,
+      token: process.env.BLOBS_TOKEN
+    });
     const blobKey = `${userHash}/${dataKey}`;
 
     if (event.httpMethod === 'GET') {
