@@ -1730,7 +1730,8 @@ document.getElementById('docUploadInput').addEventListener('change', async (e)=>
       persistDocsIndex();
       renderDocs();
     }catch(err){
-      alert(`Couldn't upload "${file.name}" — try again.`);
+      console.error("Upload error:", err);
+      alert(`Couldn't upload "${file.name}": ${err.message || 'unknown error'}`);
     }
   }
   e.target.value = "";
