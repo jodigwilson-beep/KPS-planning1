@@ -1,4 +1,4 @@
-const { getStore } = require('@netlify/blobs');
+const { connectLambda, getStore } = require('@netlify/blobs');
 const crypto = require('crypto');
 
 function hashKey(rawKey) {
@@ -17,6 +17,8 @@ exports.handler = async (event) => {
   }
 
   try {
+    connectLambda(event);
+
     const authHeader = event.headers['authorization'] || event.headers['Authorization'] || '';
     if (!authHeader.startsWith('Bearer ')) {
       return { statusCode: 401, headers, body: JSON.stringify({ error: 'Missing sync key' }) };
@@ -33,11 +35,7 @@ exports.handler = async (event) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid data key' }) };
     }
 
-    const store = getStore({
-      name: 'teaching-hub',
-      siteID: process.env.BLOBS_SITE_ID,
-      token: process.env.BLOBS_TOKEN
-    });
+    const store = getStore('teaching-hub');
     const blobKey = `${userHash}/${dataKey}`;
 
     if (event.httpMethod === 'GET') {
@@ -68,11 +66,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        error: e && e.message ? e.message : 'Unknown server error',
-        name: e && e.name,
-        cause: e && e.cause ? String(e.cause) : undefined
-      })
+      body: JSON.stringify({ error: e && e.message ? e.message : 'Unknown server error' })
     };
   }
 };
