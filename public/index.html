@@ -505,7 +505,7 @@ const cloudStorage = {
     });
     if(!res.ok){
       let detail = res.status;
-      try{ const errBody = await res.json(); if(errBody.error) detail += ': ' + errBody.error; }catch(e){}
+      try{ const errBody = await res.json(); if(errBody.error) detail += ': ' + errBody.error; if(errBody.name) detail += ' [' + errBody.name + ']'; if(errBody.cause) detail += ' cause: ' + errBody.cause; }catch(e){}
       throw new Error('Storage read failed (' + detail + ')');
     }
     const data = await res.json();
@@ -519,7 +519,7 @@ const cloudStorage = {
     });
     if(!res.ok){
       let detail = res.status;
-      try{ const errBody = await res.json(); if(errBody.error) detail += ': ' + errBody.error; }catch(e){}
+      try{ const errBody = await res.json(); if(errBody.error) detail += ': ' + errBody.error; if(errBody.name) detail += ' [' + errBody.name + ']'; if(errBody.cause) detail += ' cause: ' + errBody.cause; }catch(e){}
       throw new Error('Storage write failed (' + detail + ')');
     }
     return { key, value };
