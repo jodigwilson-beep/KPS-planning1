@@ -213,6 +213,20 @@
   .empty-state{font-size:12px; color:#8A8272; font-style:italic; padding:4px 0;}
   footer{text-align:center; font-size:11px; color:#9B927D; margin-top:22px;}
 
+  .print-only{display:none;}
+  @media print{
+    body *{visibility:hidden;}
+    .print-only, .print-only *{visibility:visible;}
+    .print-only{display:block; position:absolute; top:0; left:0; width:100%; padding:20px;}
+    .print-only h1{font-family:'Quicksand',sans-serif; font-size:22px; margin:0 0 4px; color:#000;}
+    .print-only h2{font-family:'Nunito',sans-serif; font-weight:400; font-size:13px; margin:0 0 20px; color:#333;}
+    .print-only h3{font-family:'Quicksand',sans-serif; font-size:15px; margin:18px 0 6px; border-bottom:1.5px solid #000; padding-bottom:3px; break-after:avoid;}
+    .print-only .print-subject{break-inside:avoid; margin-bottom:6px;}
+    .print-only ul{margin:0 0 4px; padding-left:18px;}
+    .print-only li{font-size:12px; line-height:1.5; margin-bottom:6px; break-inside:avoid;}
+    .print-only .print-empty{font-size:11px; color:#666; font-style:italic; margin:0 0 4px 18px;}
+  }
+
   /* ===== Resource bank view ===== */
   .res-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
   .res-toolbar input[type=text]{
@@ -313,6 +327,8 @@
       </div>
 
       <footer>Curricular areas are stored per subject — build the bank once, then reuse it week to week.</footer>
+
+      <div id="printArea" class="print-only"></div>
     </section>
 
     <!-- RESOURCES -->
@@ -1516,7 +1532,26 @@ document.getElementById('bankClose').addEventListener('click', ()=>{
 document.getElementById('cycleTitle').addEventListener('change', e=>{ cur().cycleTitle = e.target.value; persist(); });
 document.getElementById('className').addEventListener('change', e=>{ cur().className = e.target.value; persist(); });
 
-document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+function buildPrintView(){
+  const c = cur();
+  let html = `<h1>${escapeHtml(c.cycleTitle)}</h1><h2>Class: ${escapeHtml(c.className)}</h2>`;
+  SUBJECTS.forEach(subject=>{
+    html += `<div class="print-subject"><h3>${escapeHtml(subject)}</h3>`;
+    const rows = c.weeks.map((w,wi)=>{
+      const text = c.cells[cellKey(subject,wi)];
+      if(!text) return null;
+      const noteStr = w.note ? " — " + escapeHtml(w.note) : "";
+      return `<li><strong>Week ${wi+1} (${escapeHtml(w.date)}${noteStr}):</strong> ${escapeHtml(text).replace(/\n/g,'<br>')}</li>`;
+    }).filter(Boolean);
+    html += rows.length ? `<ul>${rows.join('')}</ul>` : `<div class="print-empty">Nothing planned yet.</div>`;
+    html += `</div>`;
+  });
+  document.getElementById('printArea').innerHTML = html;
+}
+document.getElementById('printBtn').addEventListener('click', ()=>{
+  buildPrintView();
+  window.print();
+});
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
