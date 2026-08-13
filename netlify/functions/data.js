@@ -68,7 +68,11 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { ...headers, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: e && e.message ? e.message : 'Unknown server error', stack: e && e.stack })
+      body: JSON.stringify({
+        error: e && e.message ? e.message : 'Unknown server error',
+        name: e && e.name,
+        cause: e && e.cause ? String(e.cause) : undefined
+      })
     };
   }
 };
