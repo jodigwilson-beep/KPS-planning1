@@ -1324,18 +1324,38 @@ function renderChips(subject){
   const bank = state.banks[subject] || [];
   const wrap = document.getElementById('cellChips');
   const none = document.getElementById('noChips');
+
+  const c = cur();
+  const usedTexts = [];
+  for(let wi=0; wi<c.weeks.length; wi++){
+    const text = c.cells[cellKey(subject, wi)];
+    if(text) usedTexts.push(text);
+  }
+  const currentDraft = document.getElementById('cellText').value;
+  if(currentDraft) usedTexts.push(currentDraft);
+  const isUsed = (itemText) => usedTexts.some(t => t.includes(itemText));
+  const available = bank.filter(item => !isUsed(item.text));
+
   if(bank.length===0){
     wrap.innerHTML = "";
     none.style.display = "block";
+    none.textContent = 'No saved curricular areas for this subject yet — add some via "Manage bank" below.';
+    return;
+  }
+  if(available.length===0){
+    wrap.innerHTML = "";
+    none.style.display = "block";
+    none.textContent = "All saved curricular areas for this subject have been used somewhere in this cycle.";
     return;
   }
   none.style.display = "none";
-  wrap.innerHTML = bank.map(item=>`<span class="chip" data-id="${item.id}">${escapeHtml(truncate(item.text,60))}</span>`).join('');
+  wrap.innerHTML = available.map(item=>`<span class="chip" data-id="${item.id}">${escapeHtml(truncate(item.text,60))}</span>`).join('');
   wrap.querySelectorAll('.chip').forEach(chip=>{
     chip.addEventListener('click', ()=>{
-      const item = bank.find(b=>b.id===chip.dataset.id);
+      const item = available.find(b=>b.id===chip.dataset.id);
       const ta = document.getElementById('cellText');
       ta.value = ta.value ? ta.value + "\n" + item.text : item.text;
+      renderChips(subject);
     });
   });
 }
