@@ -1500,13 +1500,23 @@ document.getElementById('bankClose').addEventListener('click', ()=>{
 document.getElementById('cycleTitle').addEventListener('change', e=>{ cur().cycleTitle = e.target.value; persist(); });
 document.getElementById('className').addEventListener('change', e=>{ cur().className = e.target.value; persist(); });
 
+function getWeekProgramHintForExport(subject, globalWeek){
+  if(subject === "Literacy – Spelling/Phonics") return phonicsHint(globalWeek);
+  if(subject === "Literacy – Handwriting") return handwritingHint(globalWeek);
+  if(subject === "P.E") return peHint(globalWeek);
+  return "";
+}
+
 function buildPrintView(){
   const c = cur();
   let html = `<h1>${escapeHtml(c.cycleTitle)}</h1><h2>Class: ${escapeHtml(c.className)}</h2>`;
   SUBJECTS.forEach(subject=>{
     html += `<div class="print-subject"><h3>${escapeHtml(subject)}</h3>`;
     const rows = c.weeks.map((w,wi)=>{
-      const text = c.cells[cellKey(subject,wi)];
+      const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+      const hint = getWeekProgramHintForExport(subject, globalWeek);
+      let text = c.cells[cellKey(subject,wi)] || "";
+      if(hint) text = text ? text + "\n" + hint : hint;
       if(!text) return null;
       const noteStr = w.note ? " — " + escapeHtml(w.note) : "";
       return `<li><strong>Week ${wi+1} (${escapeHtml(w.date)}${noteStr}):</strong> ${escapeHtml(text).replace(/\n/g,'<br>')}</li>`;
@@ -1535,7 +1545,10 @@ function buildGridTableHtml(c, weekStart, weekEnd){
     html += `<tr>`;
     html += `<td style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:10pt; font-weight:bold; vertical-align:top;">${escapeHtml(subject)}</td>`;
     for(let wi=weekStart; wi<=weekEnd; wi++){
-      const text = c.cells[cellKey(subject,wi)] || '';
+      const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+      const hint = getWeekProgramHintForExport(subject, globalWeek);
+      let text = c.cells[cellKey(subject,wi)] || '';
+      if(hint) text = text ? text + "\n" + hint : hint;
       html += `<td style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:9pt; vertical-align:top;">${escapeHtml(text).replace(/\n/g,'<br>')}</td>`;
     }
     html += `</tr>`;
