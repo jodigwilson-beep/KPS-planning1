@@ -204,6 +204,7 @@
 
   .bank-list{display:flex; flex-direction:column; gap:6px; margin-bottom:12px;}
   .bank-item{display:flex; justify-content:space-between; align-items:flex-start; gap:8px; background:var(--paper); border:1px solid var(--paper-line); border-radius:7px; padding:8px 10px; font-size:12.5px;}
+  .cycle-badge{display:inline-block; color:#fff; font-size:10px; font-weight:700; padding:2px 7px; border-radius:9px; margin:4px 4px 0 0;}
   .bank-item button{background:none; border:none; color:var(--danger); font-weight:700; padding:2px 6px; font-size:16px; line-height:1;}
   .add-row{display:flex; gap:8px;}
   .add-row textarea{flex:1; min-height:44px;}
@@ -1377,6 +1378,17 @@ function openBankManager(subject){
   document.getElementById('bankNewText').value = "";
   document.getElementById('bankOverlay').classList.add('open');
 }
+const CYCLE_COLORS = {1:'#F5B400', 2:'#F2701C', 3:'#EE4D82', 4:'#22B14C'};
+function cyclesUsingItem(subject, itemText){
+  const used = [];
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    const found = Object.keys(c.cells).some(key => key.startsWith(subject + "|") && c.cells[key].includes(itemText));
+    if(found) used.push(n);
+  });
+  return used;
+}
+
 function renderBankList(){
   const bank = state.banks[activeBankSubject] || [];
   document.getElementById('bankCount').textContent = `${bank.length} saved`;
@@ -1385,12 +1397,16 @@ function renderBankList(){
     list.innerHTML = '<div class="empty-state">Nothing saved yet. Paste in curricular areas from your school plans below — you\'ll be able to quick-insert them into any week.</div>';
     return;
   }
-  list.innerHTML = bank.map(item=>`
+  list.innerHTML = bank.map(item=>{
+    const usedCycles = cyclesUsingItem(activeBankSubject, item.text);
+    const badges = usedCycles.map(n=>`<span class="cycle-badge" style="background:${CYCLE_COLORS[n]}">Cycle ${n}</span>`).join('');
+    return `
     <div class="bank-item">
-      <span>${escapeHtml(item.text)}</span>
+      <span>${escapeHtml(item.text)}${badges ? '<br>' + badges : ''}</span>
       <button data-id="${item.id}" title="Remove">×</button>
     </div>
-  `).join('');
+  `;
+  }).join('');
   list.querySelectorAll('button').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       state.banks[activeBankSubject] = state.banks[activeBankSubject].filter(b=>b.id!==btn.dataset.id);
