@@ -591,6 +591,19 @@ const NUMERACY_SEED = {
   ]
 };
 
+const PE_SEED = {
+  "P.E": [
+    "Racquet Sports",
+    "Small Equipment Developmental Play",
+    "Games – Ball Skills",
+    "Dance",
+    "Gymnastics",
+    "FUN themed fitness",
+    "Athletics",
+    "Striking and Fielding Games / Orienteering"
+  ]
+};
+
 const RME_SEED = {
   "Health and Wellbeing / RME": [
     "HWB 0-11a/1-11a: Make full use of and value the opportunities I am given to improve and manage my learning, and help encourage learning and confidence in others.",
@@ -1591,7 +1604,7 @@ document.getElementById('wordBtn').addEventListener('click', downloadWordDoc);
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, RME_SEED, BUNDLE2_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, BUNDLE2_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
