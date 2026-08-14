@@ -272,6 +272,8 @@
         <button class="btn-primary" id="exportBtn">Export as text</button>
         <button class="btn-ghost" id="printBtn">Print view</button>
         <button class="btn-ghost" id="wordBtn">Download as Word</button>
+        <select id="coverageSubjectSelect" style="padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px; font-family:inherit; font-size:13px;"></select>
+        <button class="btn-ghost" id="coverageBtn">Download subject coverage (all cycles)</button>
         <button class="btn-ghost" id="resetBtn">Clear all entries</button>
         <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
         <button class="btn-ghost" id="loadCycle1Btn">Load full year plan (all 4 cycles)</button>
@@ -1589,6 +1591,14 @@ function getExportCellText(c, subject, wi){
   return text;
 }
 
+function getExportCellTextForCycle(c, cycleNum, subject, wi){
+  const globalWeek = (cycleNum - 1) * 10 + (wi + 1);
+  const hint = getWeekProgramHintForExport(subject, globalWeek);
+  let text = c.cells[cellKey(subject, wi)] || "";
+  if(hint) text = text ? text + "\n" + hint : hint;
+  return text;
+}
+
 function buildPrintView(){
   const c = cur();
   let html = `<h1>${escapeHtml(c.cycleTitle)}</h1><h2>Class: ${escapeHtml(c.className)}</h2>`;
@@ -1737,6 +1747,111 @@ async function downloadWordDoc(){
   }
 }
 document.getElementById('wordBtn').addEventListener('click', downloadWordDoc);
+
+/* Subject-coverage export: all 4 cycles for one subject, color-coded by cycle */
+const coverageSelect = document.getElementById('coverageSubjectSelect');
+coverageSelect.innerHTML = SUBJECTS.map(s=>`<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join('');
+
+async function downloadSubjectCoverage(){
+  if(!window.docx){
+    alert("Word export library hasn't loaded yet — check your connection and try again in a moment.");
+    return;
+  }
+  const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType, ShadingType, AlignmentType, VerticalAlign, PageOrientation } = window.docx;
+
+  const subject = coverageSelect.value;
+  const MARGIN = 500;
+  const PAGE_LONG = 16838;
+  const PAGE_SHORT = 11906;
+  const TOTAL_WIDTH = 14000;
+  const LABEL_COL = 2600;
+  const weekColWidth = Math.floor((TOTAL_WIDTH - LABEL_COL) / 5);
+  const actualTotal = LABEL_COL + weekColWidth * 5;
+  const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
+  const HEADER_COLOR = "12875C";
+
+  function cell(text, opts={}){
+    return new TableCell({
+      width: { size: opts.width || weekColWidth, type: WidthType.DXA },
+      shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
+      verticalAlign: VerticalAlign.TOP,
+      columnSpan: opts.span || 1,
+      margins: CELL_MARGINS,
+      children: [new Paragraph({
+        alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 18, color: opts.color })]
+      })]
+    });
+  }
+
+  function buildCoverageTable(weekStart, weekEnd){
+    const rows = [];
+    const headerCells = [cell("", {width: LABEL_COL, fill: HEADER_COLOR, bold:true, center:true, color:"FFFFFF"})];
+    for(let wi=weekStart; wi<=weekEnd; wi++){
+      headerCells.push(cell(`Week ${wi+1}`, {width: weekColWidth, fill: HEADER_COLOR, bold:true, center:true, color:"FFFFFF"}));
+    }
+    rows.push(new TableRow({ children: headerCells }));
+
+    [1,2,3,4].forEach(n=>{
+      const cyc = state.cycles[n];
+      const fillColor = hexNoHash(CYCLE_COLORS[n]);
+      const rowCells = [cell(cyc.cycleTitle, {width: LABEL_COL, fill: fillColor, bold:true, size:16})];
+      let wi = weekStart;
+      while(wi <= weekEnd){
+        const text = getExportCellTextForCycle(cyc, n, subject, wi);
+        let span = 1;
+        while(wi + span <= weekEnd && getExportCellTextForCycle(cyc, n, subject, wi+span) === text) span++;
+        const w = cyc.weeks[wi];
+        const dateLabel = w.date + (w.note ? " " + w.note : "");
+        const cellText = text ? `(${dateLabel}) ${text}` : "";
+        rowCells.push(cell(cellText, {width: weekColWidth*span, span, size:16}));
+        wi += span;
+      }
+      rows.push(new TableRow({ children: rowCells }));
+    });
+
+    return new Table({
+      width: { size: actualTotal, type: WidthType.DXA },
+      columnWidths: [LABEL_COL, weekColWidth, weekColWidth, weekColWidth, weekColWidth, weekColWidth],
+      indent: { size: 0, type: WidthType.DXA },
+      rows
+    });
+  }
+
+  const doc = new Document({
+    sections: [{
+      properties: {
+        page: {
+          size: { width: PAGE_SHORT, height: PAGE_LONG, orientation: PageOrientation.LANDSCAPE },
+          margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN }
+        }
+      },
+      children: [
+        new Paragraph({ children: [new TextRun({ text: `${subject} — Curriculum Coverage`, bold: true, size: 28 })] }),
+        new Paragraph({ children: [] }),
+        buildCoverageTable(0, 4),
+        new Paragraph({ children: [], pageBreakBefore: true }),
+        buildCoverageTable(5, 9)
+      ]
+    }]
+  });
+
+  try{
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const safeName = subject.replace(/[^\w\s-]/g, '').trim() || 'subject-coverage';
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${safeName} - coverage.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 30000);
+  }catch(e){
+    alert("Couldn't generate the Word document: " + (e.message || "unknown error"));
+  }
+}
+document.getElementById('coverageBtn').addEventListener('click', downloadSubjectCoverage);
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
