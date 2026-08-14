@@ -61,15 +61,32 @@
   }
   .nav-link:hover{opacity:1; background:rgba(245,239,220,0.08);}
   .nav-link.active{opacity:1; background:rgba(245,239,220,0.16);}
+  .nav-divider{border-top:1px solid rgba(245,239,220,0.2); margin:14px 8px 10px;}
+  .nav-section-label{font-size:10.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--chalk); opacity:0.6; margin:0 8px 8px; font-weight:700;}
+  .nav-download{
+    display:block; width:100%; text-align:left; background:rgba(245,239,220,0.06); border:1px solid rgba(245,239,220,0.15);
+    color:var(--chalk); padding:8px 10px; border-radius:7px; margin-bottom:6px;
+    font-weight:700; cursor:pointer; font-size:12px; font-family:'Nunito',sans-serif;
+  }
+  .nav-download:hover{background:rgba(245,239,220,0.14);}
+  .nav-select{
+    display:block; width:100%; margin-bottom:6px; padding:7px 8px; border-radius:7px;
+    border:1px solid rgba(245,239,220,0.25); background:rgba(245,239,220,0.06); color:var(--chalk);
+    font-family:'Nunito',sans-serif; font-size:12px;
+  }
+  .nav-select option{color:#000;}
   .hub-main{flex:1; padding:24px 28px 60px; max-width:1400px; min-width:0;}
   .hub-view{display:none;}
   .hub-view.active{display:block;}
 
   @media (max-width:800px){
     .hub-layout{flex-direction:column;}
-    .hub-nav{width:100%; height:auto; position:relative; display:flex; align-items:center; gap:6px; padding:14px;}
+    .hub-nav{width:100%; height:auto; position:relative; display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:14px;}
     .hub-brand{margin:0 10px 0 0;}
     .nav-link{width:auto; margin-bottom:0;}
+    .nav-divider{width:100%; margin:6px 0;}
+    .nav-section-label{width:100%; margin:0 0 4px;}
+    .nav-download, .nav-select{width:auto; margin-bottom:0;}
     .hub-main{padding:18px;}
   }
 
@@ -237,7 +254,17 @@
     <div class="hub-brand">Teaching Hub</div>
     <button class="nav-link active" data-view="home">Home</button>
     <button class="nav-link" data-view="planner">Ten-Week Planner</button>
-    <button class="nav-link" id="syncSettingsBtn" style="margin-left:auto;">🔑 Sync</button>
+    <button class="nav-link" data-view="bge">BGE / Topics</button>
+    <button class="nav-link" id="syncSettingsBtn">🔑 Sync</button>
+
+    <div class="nav-divider"></div>
+    <div class="nav-section-label">Downloads</div>
+    <button class="nav-download" id="exportBtn">Export as text</button>
+    <button class="nav-download" id="printBtn">Print view</button>
+    <button class="nav-download" id="wordBtn">Download as Word</button>
+    <select id="coverageSubjectSelect" class="nav-select"></select>
+    <button class="nav-download" id="coverageBtn">Subject coverage (all cycles)</button>
+    <button class="nav-download" id="bankCoverageBtn">Bank coverage (highlighted)</button>
   </nav>
 
   <main class="hub-main">
@@ -254,6 +281,11 @@
           <p>Curriculum coverage and learning intentions across four ten-week cycles, with a curricular area bank and AI-assisted suggestions.</p>
           <span class="go">Open planner →</span>
         </button>
+        <button class="tool-card" data-goto="bge">
+          <h2>BGE / Topics</h2>
+          <p>A focused view of just the Expressive Arts / Sciences / Social Studies / Technologies row across all four cycles.</p>
+          <span class="go">Open BGE / Topics →</span>
+        </button>
       </div>
     </section>
 
@@ -269,12 +301,6 @@
       <div class="cycle-tabs" id="cycleTabs"></div>
 
       <div class="toolbar">
-        <button class="btn-primary" id="exportBtn">Export as text</button>
-        <button class="btn-ghost" id="printBtn">Print view</button>
-        <button class="btn-ghost" id="wordBtn">Download as Word</button>
-        <select id="coverageSubjectSelect" style="padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px; font-family:inherit; font-size:13px;"></select>
-        <button class="btn-ghost" id="coverageBtn">Download subject coverage (all cycles)</button>
-        <button class="btn-ghost" id="bankCoverageBtn">Download bank coverage (highlighted)</button>
         <button class="btn-ghost" id="resetBtn">Clear all entries</button>
         <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
         <button class="btn-ghost" id="loadCycle1Btn">Load full year plan (all 4 cycles)</button>
@@ -292,6 +318,23 @@
       <footer>Curricular areas are stored per subject — build the bank once, then reuse it week to week.</footer>
 
       <div id="printArea" class="print-only"></div>
+    </section>
+
+    <!-- BGE / TOPICS -->
+    <section id="view-bge" class="hub-view">
+      <header>
+        <h1 id="bgeCycleTitle" style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">Planning Cycle</h1>
+        <p style="margin:0; opacity:0.85;">Expressive Arts / Sciences / Social Studies / Technologies — the topic driving each cycle.</p>
+      </header>
+
+      <div class="cycle-tabs" id="bgeCycleTabs"></div>
+
+      <div class="grid-scroll">
+        <table id="bgeGrid">
+          <thead><tr id="bgeHeadRow"></tr></thead>
+          <tbody id="bgeBodyRows"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
@@ -1114,8 +1157,8 @@ const saveStatus = document.getElementById('saveStatus');
 function cur(){ return state.cycles[state.activeCycle]; }
 function cellKey(subject, wi){ return subject + "|" + wi; }
 
-function renderTabs(){
-  const wrap = document.getElementById('cycleTabs');
+function renderTabs(containerId){
+  const wrap = document.getElementById(containerId);
   wrap.innerHTML = [1,2,3,4].map(n=>
     `<div class="cycle-tab ${n===state.activeCycle?'active':''}" data-n="${n}">Cycle ${n}</div>`
   ).join('');
@@ -1226,7 +1269,7 @@ function persist(){
 }
 
 function render(){
-  renderTabs();
+  renderTabs('cycleTabs');
   const c = cur();
   const headerEl = document.querySelector('#view-planner header');
   headerEl.className = 'c' + state.activeCycle;
@@ -1263,17 +1306,57 @@ function render(){
     </tr>`;
   }).join('');
 
-  document.querySelectorAll('.cell-inner').forEach(el=>{
+  body.querySelectorAll('.cell-inner').forEach(el=>{
     el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
   });
-  document.querySelectorAll('.bank-link').forEach(el=>{
+  body.querySelectorAll('.bank-link').forEach(el=>{
     el.addEventListener('click', ()=>openBankManager(el.dataset.subject));
   });
-  document.querySelectorAll('.wk-date-input').forEach(el=>{
+  headRow.querySelectorAll('.wk-date-input').forEach(el=>{
     el.addEventListener('change', ()=>{
       cur().weeks[parseInt(el.dataset.wi)].date = el.value;
       persist();
     });
+  });
+
+  renderBgeView();
+}
+
+function renderBgeView(){
+  const c = cur();
+  renderTabs('bgeCycleTabs');
+  const bgeHeaderEl = document.querySelector('#view-bge header');
+  bgeHeaderEl.className = 'c' + state.activeCycle;
+  document.getElementById('bgeGrid').className = 'c' + state.activeCycle;
+  document.getElementById('bgeCycleTitle').textContent = c.cycleTitle;
+
+  const headRow = document.getElementById('bgeHeadRow');
+  headRow.innerHTML = '<th class="subject-head">Curricular Area</th>' +
+    c.weeks.map((w,i)=>`
+      <th data-wi="${i}">
+        Week ${i+1}
+        <span style="display:block; font-size:11px; opacity:0.85; font-weight:400;">${escapeHtml(w.date)}</span>
+        ${w.note ? `<span class="wk-note">${escapeHtml(w.note)}</span>` : ''}
+      </th>
+    `).join('');
+
+  const body = document.getElementById('bgeBodyRows');
+  const subject = BGE_SUBJECT;
+  const cells = c.weeks.map((w,wi)=>{
+    const text = c.cells[cellKey(subject,wi)] || "";
+    const cls = text ? "cell-inner filled" : "cell-inner empty";
+    return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
+  }).join('');
+  body.innerHTML = `<tr>
+    <td class="subject-cell">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
+    ${cells}
+  </tr>`;
+
+  body.querySelectorAll('.cell-inner').forEach(el=>{
+    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
+  });
+  body.querySelectorAll('.bank-link').forEach(el=>{
+    el.addEventListener('click', ()=>openBankManager(el.dataset.subject));
   });
 }
 
