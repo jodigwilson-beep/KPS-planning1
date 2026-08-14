@@ -1088,6 +1088,7 @@ function renderTabs(){
 }
 
 function migrateSubjects(){
+  const OLD_HWB_SUBJECT = "Health and Wellbeing";
   let changed = false;
   [1,2,3,4].forEach(n=>{
     const c = state.cycles[n];
@@ -1099,8 +1100,15 @@ function migrateSubjects(){
       if(subject === OLD_COMBINED_SUBJECT){
         const text = c.cells[key];
         const { rmePart, bgePart } = splitRmeBge(text);
-        c.cells[HWB_RME_SUBJECT + "|" + wi] = rmePart;
+        const newKey = HWB_RME_SUBJECT + "|" + wi;
+        c.cells[newKey] = c.cells[newKey] ? c.cells[newKey] + "\n" + rmePart : rmePart;
         if(bgePart) c.cells[BGE_SUBJECT + "|" + wi] = bgePart;
+        delete c.cells[key];
+        changed = true;
+      }else if(subject === OLD_HWB_SUBJECT){
+        const text = c.cells[key];
+        const newKey = HWB_RME_SUBJECT + "|" + wi;
+        c.cells[newKey] = c.cells[newKey] ? c.cells[newKey] + "\n" + text : text;
         delete c.cells[key];
         changed = true;
       }
@@ -1113,6 +1121,11 @@ function migrateSubjects(){
     state.banks[HWB_RME_SUBJECT] = (state.banks[HWB_RME_SUBJECT] || []).concat(rmeItems);
     state.banks[BGE_SUBJECT] = (state.banks[BGE_SUBJECT] || []).concat(bgeItems);
     delete state.banks[OLD_COMBINED_SUBJECT];
+    changed = true;
+  }
+  if(state.banks[OLD_HWB_SUBJECT]){
+    state.banks[HWB_RME_SUBJECT] = (state.banks[HWB_RME_SUBJECT] || []).concat(state.banks[OLD_HWB_SUBJECT]);
+    delete state.banks[OLD_HWB_SUBJECT];
     changed = true;
   }
   return changed;
