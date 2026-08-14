@@ -1439,27 +1439,47 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   window.print();
 });
 
+function buildGridTableHtml(c, weekStart, weekEnd){
+  let html = `<table style="border-collapse:collapse; width:100%; margin-bottom:20pt;">`;
+  html += `<tr>`;
+  html += `<th style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:10pt; background:#2C4A3E; color:#fff; text-align:left; width:16%;">Curricular Area</th>`;
+  for(let wi=weekStart; wi<=weekEnd; wi++){
+    const w = c.weeks[wi];
+    const noteStr = w.note ? `<br><span style="font-weight:normal; font-size:8pt;">${escapeHtml(w.note)}</span>` : '';
+    html += `<th style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:10pt; background:#2C4A3E; color:#fff; text-align:left;">Week ${wi+1}<br><span style="font-weight:normal; font-size:8pt;">${escapeHtml(w.date)}</span>${noteStr}</th>`;
+  }
+  html += `</tr>`;
+  SUBJECTS.forEach(subject=>{
+    html += `<tr>`;
+    html += `<td style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:10pt; font-weight:bold; vertical-align:top;">${escapeHtml(subject)}</td>`;
+    for(let wi=weekStart; wi<=weekEnd; wi++){
+      const text = c.cells[cellKey(subject,wi)] || '';
+      html += `<td style="border:1px solid #000; padding:6pt; font-family:Calibri,sans-serif; font-size:9pt; vertical-align:top;">${escapeHtml(text).replace(/\n/g,'<br>')}</td>`;
+    }
+    html += `</tr>`;
+  });
+  html += `</table>`;
+  return html;
+}
+
 function downloadWordDoc(){
   const c = cur();
   let bodyHtml = `<h1 style="font-family:Calibri,sans-serif;">${escapeHtml(c.cycleTitle)}</h1><p style="font-family:Calibri,sans-serif;">Class: ${escapeHtml(c.className)}</p>`;
-  SUBJECTS.forEach(subject=>{
-    bodyHtml += `<h2 style="font-family:Calibri,sans-serif; font-size:14pt; border-bottom:1px solid #000; padding-bottom:2pt;">${escapeHtml(subject)}</h2>`;
-    const rows = c.weeks.map((w,wi)=>{
-      const text = c.cells[cellKey(subject,wi)];
-      if(!text) return null;
-      const noteStr = w.note ? " — " + escapeHtml(w.note) : "";
-      return `<li style="font-family:Calibri,sans-serif; font-size:11pt; margin-bottom:6pt;"><b>Week ${wi+1} (${escapeHtml(w.date)}${noteStr}):</b> ${escapeHtml(text).replace(/\n/g,'<br>')}</li>`;
-    }).filter(Boolean);
-    bodyHtml += rows.length
-      ? `<ul>${rows.join('')}</ul>`
-      : `<p style="font-family:Calibri,sans-serif; font-style:italic; color:#666;">Nothing planned yet.</p>`;
-  });
+  bodyHtml += `<h2 style="font-family:Calibri,sans-serif; font-size:13pt;">Weeks 1–5</h2>`;
+  bodyHtml += buildGridTableHtml(c, 0, 4);
+  bodyHtml += `<br style="page-break-before:always;">`;
+  bodyHtml += `<h2 style="font-family:Calibri,sans-serif; font-size:13pt;">Weeks 6–10</h2>`;
+  bodyHtml += buildGridTableHtml(c, 5, 9);
 
   const fullHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
 <head><meta charset="utf-8"><title>${escapeHtml(c.cycleTitle)}</title>
 <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+<style>
+  @page Section1 { size: 29.7cm 21cm; mso-page-orientation: landscape; }
+  div.Section1 { page: Section1; }
+</style>
 </head>
-<body>${bodyHtml}</body></html>`;
+<body><div class="Section1">${bodyHtml}</div></body></html>`;
 
   const blob = new Blob(['\ufeff', fullHtml], {type: 'application/msword'});
   const url = URL.createObjectURL(blob);
