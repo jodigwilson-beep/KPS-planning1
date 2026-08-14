@@ -87,8 +87,6 @@
   .tool-card h2{font-family:'Quicksand',sans-serif; font-size:18px; margin:0; color:var(--board);}
   .tool-card p{margin:0; font-size:13px; color:#6B6252;}
   .tool-card .go{font-size:12px; font-weight:700; color:var(--ochre);}
-  .tool-card.resources{border-top-color:var(--blue);}
-  .tool-card.resources .go{color:var(--blue);}
 
   /* ===== Planner view (from ten-week planner) ===== */
   header{
@@ -227,43 +225,6 @@
     .print-only .print-empty{font-size:11px; color:#666; font-style:italic; margin:0 0 4px 18px;}
   }
 
-  /* ===== Resource bank view ===== */
-  .res-toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
-  .res-toolbar input[type=text]{
-    padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px;
-    font-family:inherit; font-size:13px; min-width:200px;
-  }
-  .res-toolbar select{padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px; font-family:inherit; font-size:13px;}
-  .res-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px;}
-  .res-card{
-    background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius);
-    padding:14px 16px; display:flex; flex-direction:column; gap:6px;
-  }
-  .res-card .res-type{
-    align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase;
-    letter-spacing:0.05em; background:var(--blue-soft); color:var(--blue); padding:3px 8px; border-radius:10px;
-  }
-  .res-card h3{font-family:'Quicksand',sans-serif; font-size:16px; margin:2px 0 0; color:var(--board);}
-  .res-card .res-subject{font-size:11.5px; color:var(--ochre); font-weight:700;}
-  .res-card p{font-size:12.5px; color:#5C5648; margin:2px 0 0; white-space:pre-wrap;}
-  .res-card .res-tags{font-size:11px; color:var(--blue); margin-top:2px;}
-  .res-card .res-actions{display:flex; gap:8px; margin-top:8px;}
-  .res-card .res-actions a, .res-card .res-actions button{font-size:12px;}
-  .res-card a.res-link{color:var(--blue); text-decoration:underline;}
-
-  .doc-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:14px;}
-  .doc-card{
-    background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius);
-    padding:14px 16px; display:flex; flex-direction:column; gap:6px;
-  }
-  .doc-card .doc-type{
-    align-self:flex-start; font-size:10.5px; font-weight:700; text-transform:uppercase;
-    letter-spacing:0.05em; background:var(--ochre-soft); color:#6B4A1E; padding:3px 8px; border-radius:10px;
-  }
-  .doc-card h3{font-family:'Quicksand',sans-serif; font-size:15px; margin:2px 0 0; color:var(--board); word-break:break-word;}
-  .doc-card .doc-meta{font-size:11px; color:#8A8272;}
-  .doc-card .doc-actions{display:flex; gap:8px; margin-top:6px;}
-  .doc-card .doc-actions button{font-size:12px;}
 </style>
 </head>
 <body>
@@ -272,8 +233,6 @@
     <div class="hub-brand">Teaching Hub</div>
     <button class="nav-link active" data-view="home">Home</button>
     <button class="nav-link" data-view="planner">Ten-Week Planner</button>
-    <button class="nav-link" data-view="resources">Resource Bank</button>
-    <button class="nav-link" data-view="documents">Documents</button>
     <button class="nav-link" id="syncSettingsBtn" style="margin-left:auto;">🔑 Sync</button>
   </nav>
 
@@ -290,11 +249,6 @@
           <h2>Ten-Week Planner</h2>
           <p>Curriculum coverage and learning intentions across four ten-week cycles, with a curricular area bank and AI-assisted suggestions.</p>
           <span class="go">Open planner →</span>
-        </button>
-        <button class="tool-card resources" data-goto="resources">
-          <h2>Resource Bank</h2>
-          <p>Store and organise lesson resources and links by subject, so you can find them again in seconds.</p>
-          <span class="go">Open resource bank →</span>
         </button>
       </div>
     </section>
@@ -313,6 +267,7 @@
       <div class="toolbar">
         <button class="btn-primary" id="exportBtn">Export as text</button>
         <button class="btn-ghost" id="printBtn">Print view</button>
+        <button class="btn-ghost" id="wordBtn">Download as Word</button>
         <button class="btn-ghost" id="resetBtn">Clear all entries</button>
         <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
         <button class="btn-ghost" id="loadCycle1Btn">Load full year plan (all 4 cycles)</button>
@@ -329,37 +284,6 @@
       <footer>Curricular areas are stored per subject — build the bank once, then reuse it week to week.</footer>
 
       <div id="printArea" class="print-only"></div>
-    </section>
-
-    <!-- RESOURCES -->
-    <section id="view-resources" class="hub-view">
-      <div class="home-hero">
-        <h1>Resource Bank</h1>
-        <p>Lesson resources and links, organised by subject.</p>
-      </div>
-      <div class="res-toolbar">
-        <button class="btn-primary" id="addResourceBtn">+ Add resource</button>
-        <input type="text" id="resSearch" placeholder="Search title, notes, tags…">
-        <select id="resSubjectFilter"><option value="">All subjects</option></select>
-        <span class="save-status" id="resSaveStatus">Loading…</span>
-      </div>
-      <div class="res-grid" id="resGrid"></div>
-      <div class="empty-state" id="resEmpty" style="display:none;">No resources saved yet — click "+ Add resource" to start building your bank.</div>
-    </section>
-
-    <!-- DOCUMENTS -->
-    <section id="view-documents" class="hub-view">
-      <div class="home-hero">
-        <h1>Documents</h1>
-        <p>Upload your curriculum plans (PDF or Word) here so you can open them anytime, on any device.</p>
-      </div>
-      <div class="res-toolbar">
-        <label class="btn-primary" for="docUploadInput" style="cursor:pointer;">+ Upload document(s)</label>
-        <input type="file" id="docUploadInput" accept=".pdf,.doc,.docx" multiple style="display:none;">
-        <span class="save-status" id="docSaveStatus">Loading…</span>
-      </div>
-      <div class="doc-grid" id="docGrid"></div>
-      <div class="empty-state" id="docEmpty" style="display:none;">No documents uploaded yet — click "+ Upload document(s)" to add your curriculum plans. PDFs open in a new tab; Word docs download to open. Individual files up to about 3.5MB.</div>
     </section>
 
   </main>
@@ -417,44 +341,6 @@
     <div class="modal-foot">
       <span></span>
       <button class="btn-ghost" id="bankClose">Close</button>
-    </div>
-  </div>
-</div>
-
-<!-- Resource editor modal -->
-<div class="overlay" id="resOverlay">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 id="resModalTitle">Add resource</h2>
-      <span></span>
-    </div>
-    <div class="modal-body">
-      <div class="field-label">Title</div>
-      <input type="text" id="resTitle" placeholder="e.g. Monkey King comprehension pack">
-      <div class="field-label">Subject</div>
-      <select id="resSubject"></select>
-      <div class="field-label">Type</div>
-      <select id="resType">
-        <option>Worksheet</option>
-        <option>Link</option>
-        <option>Video</option>
-        <option>Activity</option>
-        <option>Template</option>
-        <option>Other</option>
-      </select>
-      <div class="field-label">Link (optional)</div>
-      <input type="url" id="resUrl" placeholder="https://…">
-      <div class="field-label">Notes</div>
-      <textarea id="resNotes" placeholder="What it's for, where it's saved, differentiation notes…"></textarea>
-      <div class="field-label">Tags (comma separated, optional)</div>
-      <input type="text" id="resTags" placeholder="e.g. differentiated, P3, group work">
-    </div>
-    <div class="modal-foot">
-      <button class="btn-ghost" id="resDeleteBtn" style="display:none; color:var(--danger);">Delete</button>
-      <div style="display:flex; gap:8px; margin-left:auto;">
-        <button class="btn-ghost" id="resCancel">Cancel</button>
-        <button class="btn-primary" id="resSave">Save</button>
-      </div>
     </div>
   </div>
 </div>
@@ -1553,6 +1439,41 @@ document.getElementById('printBtn').addEventListener('click', ()=>{
   window.print();
 });
 
+function downloadWordDoc(){
+  const c = cur();
+  let bodyHtml = `<h1 style="font-family:Calibri,sans-serif;">${escapeHtml(c.cycleTitle)}</h1><p style="font-family:Calibri,sans-serif;">Class: ${escapeHtml(c.className)}</p>`;
+  SUBJECTS.forEach(subject=>{
+    bodyHtml += `<h2 style="font-family:Calibri,sans-serif; font-size:14pt; border-bottom:1px solid #000; padding-bottom:2pt;">${escapeHtml(subject)}</h2>`;
+    const rows = c.weeks.map((w,wi)=>{
+      const text = c.cells[cellKey(subject,wi)];
+      if(!text) return null;
+      const noteStr = w.note ? " — " + escapeHtml(w.note) : "";
+      return `<li style="font-family:Calibri,sans-serif; font-size:11pt; margin-bottom:6pt;"><b>Week ${wi+1} (${escapeHtml(w.date)}${noteStr}):</b> ${escapeHtml(text).replace(/\n/g,'<br>')}</li>`;
+    }).filter(Boolean);
+    bodyHtml += rows.length
+      ? `<ul>${rows.join('')}</ul>`
+      : `<p style="font-family:Calibri,sans-serif; font-style:italic; color:#666;">Nothing planned yet.</p>`;
+  });
+
+  const fullHtml = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head><meta charset="utf-8"><title>${escapeHtml(c.cycleTitle)}</title>
+<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->
+</head>
+<body>${bodyHtml}</body></html>`;
+
+  const blob = new Blob(['\ufeff', fullHtml], {type: 'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const safeName = c.cycleTitle.replace(/[^\w\s-]/g, '').trim() || 'planning-cycle';
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${safeName}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 30000);
+}
+document.getElementById('wordBtn').addEventListener('click', downloadWordDoc);
+
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
   const allSeeds = [LITERACY_SEED, NUMERACY_SEED, RME_SEED, BUNDLE2_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
@@ -1634,290 +1555,9 @@ document.querySelectorAll('.overlay').forEach(ov=>{
   ov.addEventListener('click', e=>{ if(e.target===ov) ov.classList.remove('open'); });
 });
 
-/* ============ RESOURCE BANK ============ */
-const RES_STORAGE_KEY = "hub-resources-state";
-const RES_SUBJECTS = ["General"].concat(SUBJECTS);
-let resources = [];
-let activeResourceId = null;
-const resSaveStatus = document.getElementById('resSaveStatus');
-
-// populate subject dropdowns
-document.getElementById('resSubject').innerHTML = RES_SUBJECTS.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
-document.getElementById('resSubjectFilter').innerHTML =
-  '<option value="">All subjects</option>' + RES_SUBJECTS.map(s=>`<option>${escapeHtml(s)}</option>`).join('');
-
-let resSaveTimer = null;
-function persistResources(){
-  resSaveStatus.textContent = "Saving…";
-  clearTimeout(resSaveTimer);
-  resSaveTimer = setTimeout(async ()=>{
-    try{
-      await cloudStorage.set(RES_STORAGE_KEY, JSON.stringify(resources));
-      resSaveStatus.textContent = "Saved";
-    }catch(e){
-      resSaveStatus.textContent = "Couldn't save: " + (e.message || "check connection");
-    }
-  }, 250);
-}
-
-async function loadResources(){
-  try{
-    const res = await cloudStorage.get(RES_STORAGE_KEY);
-    if(res && res.value) resources = JSON.parse(res.value);
-    resSaveStatus.textContent = "Synced";
-  }catch(e){
-    resSaveStatus.textContent = "Starting fresh";
-  }
-  renderResources();
-}
-
-function renderResources(){
-  const search = document.getElementById('resSearch').value.trim().toLowerCase();
-  const subjectFilter = document.getElementById('resSubjectFilter').value;
-  const grid = document.getElementById('resGrid');
-  const empty = document.getElementById('resEmpty');
-
-  let list = resources.slice().sort((a,b)=> (a.title||"").localeCompare(b.title||""));
-  if(subjectFilter) list = list.filter(r=>r.subject===subjectFilter);
-  if(search) list = list.filter(r=>{
-    const hay = [r.title, r.notes, (r.tags||[]).join(' ')].join(' ').toLowerCase();
-    return hay.includes(search);
-  });
-
-  if(list.length===0){
-    grid.innerHTML = "";
-    empty.style.display = "block";
-    empty.textContent = resources.length===0
-      ? 'No resources saved yet — click "+ Add resource" to start building your bank.'
-      : "No resources match your search/filter.";
-    return;
-  }
-  empty.style.display = "none";
-
-  grid.innerHTML = list.map(r=>`
-    <div class="res-card" data-id="${r.id}">
-      <span class="res-type">${escapeHtml(r.type||"Other")}</span>
-      <h3>${escapeHtml(r.title||"Untitled")}</h3>
-      <span class="res-subject">${escapeHtml(r.subject||"General")}</span>
-      ${r.notes ? `<p>${escapeHtml(truncate(r.notes,140))}</p>` : ""}
-      ${(r.tags && r.tags.length) ? `<span class="res-tags">${r.tags.map(t=>'#'+escapeHtml(t)).join(' ')}</span>` : ""}
-      <div class="res-actions">
-        ${r.url ? `<a class="res-link" href="${escapeAttr(r.url)}" target="_blank" rel="noopener">Open link</a>` : ""}
-        <button class="btn-ghost res-edit" data-id="${r.id}">Edit</button>
-      </div>
-    </div>
-  `).join('');
-
-  grid.querySelectorAll('.res-edit').forEach(btn=>{
-    btn.addEventListener('click', ()=>openResourceEditor(btn.dataset.id));
-  });
-}
-
-document.getElementById('resSearch').addEventListener('input', renderResources);
-document.getElementById('resSubjectFilter').addEventListener('change', renderResources);
-
-function openResourceEditor(id){
-  activeResourceId = id || null;
-  const r = id ? resources.find(x=>x.id===id) : null;
-  document.getElementById('resModalTitle').textContent = r ? "Edit resource" : "Add resource";
-  document.getElementById('resTitle').value = r ? r.title : "";
-  document.getElementById('resSubject').value = r ? r.subject : "General";
-  document.getElementById('resType').value = r ? r.type : "Worksheet";
-  document.getElementById('resUrl').value = r ? (r.url||"") : "";
-  document.getElementById('resNotes').value = r ? (r.notes||"") : "";
-  document.getElementById('resTags').value = r ? (r.tags||[]).join(', ') : "";
-  document.getElementById('resDeleteBtn').style.display = r ? "inline-block" : "none";
-  document.getElementById('resOverlay').classList.add('open');
-  document.getElementById('resTitle').focus();
-}
-document.getElementById('addResourceBtn').addEventListener('click', ()=>openResourceEditor(null));
-document.getElementById('resCancel').addEventListener('click', ()=>{
-  document.getElementById('resOverlay').classList.remove('open');
-});
-document.getElementById('resSave').addEventListener('click', ()=>{
-  const title = document.getElementById('resTitle').value.trim();
-  if(!title){ alert("Give the resource a title."); return; }
-  const data = {
-    title,
-    subject: document.getElementById('resSubject').value,
-    type: document.getElementById('resType').value,
-    url: document.getElementById('resUrl').value.trim(),
-    notes: document.getElementById('resNotes').value.trim(),
-    tags: document.getElementById('resTags').value.split(',').map(t=>t.trim()).filter(Boolean)
-  };
-  if(activeResourceId){
-    const idx = resources.findIndex(r=>r.id===activeResourceId);
-    resources[idx] = Object.assign(resources[idx], data);
-  }else{
-    resources.push(Object.assign({id:'r'+Date.now()+Math.random().toString(36).slice(2,7)}, data));
-  }
-  persistResources();
-  renderResources();
-  document.getElementById('resOverlay').classList.remove('open');
-});
-document.getElementById('resDeleteBtn').addEventListener('click', ()=>{
-  if(!activeResourceId) return;
-  if(confirm("Delete this resource?")){
-    resources = resources.filter(r=>r.id!==activeResourceId);
-    persistResources();
-    renderResources();
-    document.getElementById('resOverlay').classList.remove('open');
-  }
-});
-
-/* ============ DOCUMENTS ============ */
-const DOC_INDEX_KEY = "hubdocsindex";
-let docsIndex = [];
-const docSaveStatus = document.getElementById('docSaveStatus');
-
-const DOC_TYPE_MIME = {
-  pdf: "application/pdf",
-  doc: "application/msword",
-  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-};
-
-function extOf(filename){
-  const m = filename.toLowerCase().match(/\.([a-z0-9]+)$/);
-  return m ? m[1] : "";
-}
-function fileToBase64(file){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = ()=> resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-function formatSize(bytes){
-  if(bytes < 1024) return bytes + " B";
-  if(bytes < 1024*1024) return Math.round(bytes/1024) + " KB";
-  return (bytes/(1024*1024)).toFixed(1) + " MB";
-}
-
-let docSaveTimer = null;
-function persistDocsIndex(){
-  docSaveStatus.textContent = "Saving…";
-  clearTimeout(docSaveTimer);
-  docSaveTimer = setTimeout(async ()=>{
-    try{
-      await cloudStorage.set(DOC_INDEX_KEY, JSON.stringify(docsIndex));
-      docSaveStatus.textContent = "Synced";
-    }catch(e){
-      docSaveStatus.textContent = "Couldn't save: " + (e.message || "check connection");
-    }
-  }, 250);
-}
-
-async function loadDocs(){
-  try{
-    const res = await cloudStorage.get(DOC_INDEX_KEY);
-    if(res && res.value) docsIndex = JSON.parse(res.value);
-    docSaveStatus.textContent = "Synced";
-  }catch(e){
-    docSaveStatus.textContent = "Starting fresh";
-  }
-  renderDocs();
-}
-
-function renderDocs(){
-  const grid = document.getElementById('docGrid');
-  const empty = document.getElementById('docEmpty');
-  if(docsIndex.length===0){
-    grid.innerHTML = "";
-    empty.style.display = "block";
-    return;
-  }
-  empty.style.display = "none";
-  const sorted = docsIndex.slice().sort((a,b)=>a.name.localeCompare(b.name));
-  grid.innerHTML = sorted.map(d=>`
-    <div class="doc-card">
-      <span class="doc-type">${escapeHtml(d.ext.toUpperCase())}</span>
-      <h3>${escapeHtml(d.name)}</h3>
-      <span class="doc-meta">${formatSize(d.size)} · uploaded ${new Date(d.uploadedAt).toLocaleDateString()}</span>
-      <div class="doc-actions">
-        <button class="btn-primary doc-open" data-id="${d.id}">Open</button>
-        <button class="btn-ghost doc-delete" data-id="${d.id}" style="color:var(--danger);">Delete</button>
-      </div>
-    </div>
-  `).join('');
-  grid.querySelectorAll('.doc-open').forEach(btn=>{
-    btn.addEventListener('click', ()=>openDoc(btn.dataset.id));
-  });
-  grid.querySelectorAll('.doc-delete').forEach(btn=>{
-    btn.addEventListener('click', ()=>deleteDoc(btn.dataset.id));
-  });
-}
-
-async function openDoc(id){
-  const meta = docsIndex.find(d=>d.id===id);
-  if(!meta) return;
-  try{
-    const res = await cloudStorage.get('hubdoc' + id);
-    if(!res || !res.value){ alert("Couldn't find that file's content."); return; }
-    const byteChars = atob(res.value);
-    const byteNumbers = new Array(byteChars.length);
-    for(let i=0;i<byteChars.length;i++) byteNumbers[i] = byteChars.charCodeAt(i);
-    const byteArray = new Uint8Array(byteNumbers);
-    const mime = DOC_TYPE_MIME[meta.ext] || "application/octet-stream";
-    const blob = new Blob([byteArray], {type: mime});
-    const url = URL.createObjectURL(blob);
-    if(meta.ext === 'pdf'){
-      window.open(url, '_blank');
-    }else{
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = meta.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-    setTimeout(()=>URL.revokeObjectURL(url), 60000);
-  }catch(e){
-    alert("Couldn't open that file — try re-uploading it.");
-  }
-}
-
-async function deleteDoc(id){
-  if(!confirm("Delete this document?")) return;
-  docsIndex = docsIndex.filter(d=>d.id!==id);
-  persistDocsIndex();
-  renderDocs();
-  try{ await cloudStorage.set('hubdoc' + id, ''); }catch(e){}
-}
-
-document.getElementById('docUploadInput').addEventListener('change', async (e)=>{
-  const files = Array.from(e.target.files || []);
-  for(const file of files){
-    const ext = extOf(file.name);
-    if(!['pdf','doc','docx'].includes(ext)){
-      alert(`Skipped "${file.name}" — only PDF and Word files are supported.`);
-      continue;
-    }
-    if(file.size > 3.7 * 1024 * 1024){
-      alert(`"${file.name}" is too large (over ~3.5MB) — try a smaller file.`);
-      continue;
-    }
-    docSaveStatus.textContent = "Uploading…";
-    try{
-      const base64 = await fileToBase64(file);
-      const id = 'd' + Date.now() + Math.random().toString(36).slice(2,7);
-      await cloudStorage.set('hubdoc' + id, base64);
-      docsIndex.push({id, name: file.name, ext, size: file.size, uploadedAt: Date.now()});
-      persistDocsIndex();
-      renderDocs();
-    }catch(err){
-      console.error("Upload error:", err);
-      alert(`Couldn't upload "${file.name}": ${err.message || 'unknown error'}`);
-    }
-  }
-  e.target.value = "";
-});
-
 /* ============ Init ============ */
 if(syncKey){
   loadState();
-  loadResources();
-  loadDocs();
 }
 </script>
 </body>
