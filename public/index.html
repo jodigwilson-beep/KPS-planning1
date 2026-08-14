@@ -487,7 +487,7 @@ function goto(view){
 /* ============ PLANNER ============ */
 const SUBJECTS = [
   "Ethos and Life of the School",
-  "Health and Wellbeing",
+  "Health and Wellbeing / RME",
   "P.E",
   "Numeracy (Big Maths CLIC)",
   "Mathematics",
@@ -498,11 +498,20 @@ const SUBJECTS = [
   "Literacy – Listening and Talking",
   "Literacy – Handwriting",
   "1+2",
-  "RME / Expressive Arts / Sciences / Social Studies / Technologies"
+  "Expressive Arts / Sciences / Social Studies / Technologies"
 ];
-const BGE_SUBJECT = "RME / Expressive Arts / Sciences / Social Studies / Technologies";
+const OLD_COMBINED_SUBJECT = "RME / Expressive Arts / Sciences / Social Studies / Technologies";
+const BGE_SUBJECT = "Expressive Arts / Sciences / Social Studies / Technologies";
+const HWB_RME_SUBJECT = "Health and Wellbeing / RME";
 const WRITING_SUBJECT = "Literacy – Writing";
 const LISTENING_SUBJECT = "Literacy – Listening and Talking";
+
+function splitRmeBge(text){
+  const idx = text.indexOf("\nBGE");
+  const rmePart = idx >= 0 ? text.slice(0, idx) : text;
+  const bgePart = idx >= 0 ? text.slice(idx + 1) : null;
+  return { rmePart, bgePart };
+}
 
 const BLANK_WEEKS = Array.from({length:10}, (_,i)=>({date:"", note:""}));
 
@@ -583,7 +592,7 @@ const NUMERACY_SEED = {
 };
 
 const RME_SEED = {
-  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+  "Health and Wellbeing / RME": [
     "RME 1-01a: Through exploring Bible stories, describe some beliefs Christians have about God and Jesus.",
     "RME 1-01c: Talk about my own beliefs, or express them in other ways.",
     "RME 1-02a: Having explored biblical and other Christian stories, show developing understanding of key values of Christianity and how they might be put into action in people's lives and communities.",
@@ -596,7 +605,7 @@ const RME_SEED = {
 };
 
 const BUNDLE2_SEED = {
-  "RME / Expressive Arts / Sciences / Social Studies / Technologies": [
+  "Expressive Arts / Sciences / Social Studies / Technologies": [
     "EXA 1-06a: Use exploration and imagination to solve design problems related to real-life situations.",
     "EXA 1-10a: Become aware of different features of dance and practise and perform steps, formations and a short dance.",
     "EXA 1-13a: Inspired by a range of stimuli, express and communicate my ideas, thoughts and feelings through drama.",
@@ -1078,6 +1087,37 @@ function renderTabs(){
   });
 }
 
+function migrateSubjects(){
+  let changed = false;
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    if(!c) return;
+    Object.keys(c.cells).forEach(key=>{
+      const sep = key.lastIndexOf("|");
+      const subject = key.slice(0, sep);
+      const wi = key.slice(sep+1);
+      if(subject === OLD_COMBINED_SUBJECT){
+        const text = c.cells[key];
+        const { rmePart, bgePart } = splitRmeBge(text);
+        c.cells[HWB_RME_SUBJECT + "|" + wi] = rmePart;
+        if(bgePart) c.cells[BGE_SUBJECT + "|" + wi] = bgePart;
+        delete c.cells[key];
+        changed = true;
+      }
+    });
+  });
+  if(state.banks[OLD_COMBINED_SUBJECT]){
+    const items = state.banks[OLD_COMBINED_SUBJECT];
+    const rmeItems = items.filter(it => /^RME\b/.test(it.text));
+    const bgeItems = items.filter(it => !/^RME\b/.test(it.text));
+    state.banks[HWB_RME_SUBJECT] = (state.banks[HWB_RME_SUBJECT] || []).concat(rmeItems);
+    state.banks[BGE_SUBJECT] = (state.banks[BGE_SUBJECT] || []).concat(bgeItems);
+    delete state.banks[OLD_COMBINED_SUBJECT];
+    changed = true;
+  }
+  return changed;
+}
+
 async function loadState(){
   try{
     const res = await cloudStorage.get(STORAGE_KEY);
@@ -1085,6 +1125,7 @@ async function loadState(){
       const loaded = JSON.parse(res.value);
       state = Object.assign(state, loaded);
     }
+    if(migrateSubjects()) persist();
     saveStatus.textContent = "Synced";
   }catch(e){
     saveStatus.textContent = "Starting fresh";
@@ -1535,9 +1576,10 @@ document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
 document.getElementById('loadCycle1Btn').addEventListener('click', ()=>{
   const anyExisting = [1,2,3,4].some(n=>{
     const c = state.cycles[n];
-    return Object.keys(c.cells).some(k =>
-      Object.keys(ALL_CYCLES_DATA[n].cells).some(subj => k.startsWith(subj + "|"))
-    );
+    return Object.keys(ALL_CYCLES_DATA[n].cells).some(subj=>{
+      const checkSubjects = subj === OLD_COMBINED_SUBJECT ? [HWB_RME_SUBJECT, BGE_SUBJECT] : [subj];
+      return checkSubjects.some(cs => Object.keys(c.cells).some(k => k.startsWith(cs + "|")));
+    });
   });
   if(anyExisting && !confirm("Some cycles already have entries in these subjects — this will overwrite them with the full-year topic plan (Toy Detectives / Arctic Explorers / Little Inventors' Workshop / Our Street, Our Story). Continue?")){
     return;
@@ -1549,7 +1591,13 @@ document.getElementById('loadCycle1Btn').addEventListener('click', ()=>{
     c.weeks = JSON.parse(JSON.stringify(data.weeks));
     Object.keys(data.cells).forEach(subject=>{
       data.cells[subject].forEach((text, wi)=>{
-        c.cells[cellKey(subject, wi)] = text;
+        if(subject === OLD_COMBINED_SUBJECT){
+          const { rmePart, bgePart } = splitRmeBge(text);
+          c.cells[cellKey(HWB_RME_SUBJECT, wi)] = rmePart;
+          if(bgePart) c.cells[cellKey(BGE_SUBJECT, wi)] = bgePart;
+        }else{
+          c.cells[cellKey(subject, wi)] = text;
+        }
       });
     });
   });
