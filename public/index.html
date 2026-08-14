@@ -293,9 +293,7 @@
     <section id="view-planner" class="hub-view">
       <header>
         <input type="text" id="cycleTitle" value="Planning Cycle 2 (10 weeks)">
-        <div class="meta">
-          <div class="cycle-field"><label>Class</label><input type="text" id="className" value="P2"></div>
-        </div>
+        <input type="text" id="className" value="P2" style="display:none;">
       </header>
 
       <div class="cycle-tabs" id="cycleTabs"></div>
@@ -555,6 +553,7 @@ const BGE_SUBJECT = "Expressive Arts / Sciences / Social Studies / Technologies"
 const HWB_RME_SUBJECT = "Health and Wellbeing / RME";
 const WRITING_SUBJECT = "Literacy – Writing";
 const LISTENING_SUBJECT = "Literacy – Listening and Talking";
+const PLANNER_DISPLAY_SUBJECTS = SUBJECTS.filter(s => s !== BGE_SUBJECT);
 
 function splitRmeBge(text){
   const idx = text.indexOf("\nBGE");
@@ -715,6 +714,43 @@ const BUNDLE2_SEED = {
   ]
 };
 const BUNDLE2_CONTEXTS = "Suggested contexts: Water (flooding), Transport, Enterprise (textiles design), Development of Technology (Inventors); Other: Winter/Arctic theme, Mapping, Sustainability, Toys & Games.";
+
+/* BGE / Topics view: the combined lane split into its four original areas */
+const BGE_SPLIT_SUBJECTS = ["Expressive Arts", "Sciences", "Social Studies", "Technologies"];
+const BGE_LEAD_SUBJECT_BY_CYCLE = { 1: "Sciences", 2: "Expressive Arts", 3: "Technologies", 4: "Social Studies" };
+const BUNDLE2_SPLIT_SEED = {
+  "Expressive Arts": [
+    "EXA 1-06a: Use exploration and imagination to solve design problems related to real-life situations.",
+    "EXA 1-10a: Become aware of different features of dance and practise and perform steps, formations and a short dance.",
+    "EXA 1-13a: Inspired by a range of stimuli, express and communicate my ideas, thoughts and feelings through drama.",
+    "EXA 1-14a: Develop confidence and skills in creating and presenting drama which explores real and imaginary situations, using improvisation and script.",
+    "EXA 1-17a: Use my voice, musical instruments and music technology to discover and enjoy playing with sound and rhythm."
+  ],
+  "Sciences": [
+    "SCN 1-07a: By investigating forces on toys and other objects, predict the effect on the shape or motion of objects.",
+    "SCN 1-08a: By exploring the forces exerted by magnets on other magnets and magnetic materials, contribute to the design of a game.",
+    "SCN 1-05a: By investigating how water can change from one form to another, relate my findings to everyday experiences.",
+    "SCN 1-16a: Make and test predictions about solids dissolving in water and relate my findings to the world around me.",
+    "SCN 1-15a: Through exploring properties and sources of materials, choose appropriate materials to solve practical challenges."
+  ],
+  "Social Studies": [
+    "SOC 1-04a: Compare aspects of people's daily lives in the past with my own, using historical evidence or the experience of recreating an historical setting.",
+    "SOC 1-06a: Consider ways of looking after my school or community and encourage others to care for their environment.",
+    "SOC 1-08a: By exploring my community and the groups within it, identify and consider different types of housing and how they meet needs.",
+    "SOC 1-11a: Through activities in my local area, develop my mental map and sense of place, and create and use maps of the area.",
+    "SOC 1-14a: Develop an understanding of the importance of local organisations in providing for the needs of my local community."
+  ],
+  "Technologies": [
+    "TCH 1-04a: Use a range of simple food preparation techniques when working with food.",
+    "TCH 1-04b: Use a range of tools and equipment when working with textiles.",
+    "TCH 1-04c: Develop and use problem solving strategies to meet challenges with a food or textile focus.",
+    "TCH 1-04d: Adapt and improve ideas and express my own thinking in different ways.",
+    "TCH 1-13a: Explore and comment on processes in the world around me, making use of core computational thinking concepts, and organise information in a logical way.",
+    "TCH 1-14a: Understand the instructions of a visual programming language and predict the outcome of a program written using the language.",
+    "TCH 1-14b: Understand how computers process information.",
+    "TCH 1-15a: Demonstrate a range of basic problem-solving skills by building simple programs to carry out a given task, using an appropriate language."
+  ]
+};
 
 const MLAN_SEED = {
   "1+2": [
@@ -1072,10 +1108,10 @@ const CYCLE4_CELLS = {
 };
 
 const ALL_CYCLES_DATA = {
-  1: {title: "Planning Cycle 1 (10 weeks) — Toy Detectives: What Makes It Go?", weeks: CYCLE1_WEEKS, cells: CYCLE1_CELLS},
-  2: {title: "Planning Cycle 2 (10 weeks) — Arctic Explorers: Survive the Freeze", weeks: CYCLE2_WEEKS, cells: CYCLE2_CELLS},
-  3: {title: "Planning Cycle 3 (10 weeks) — Little Inventors' Workshop", weeks: CYCLE3_WEEKS, cells: CYCLE3_CELLS},
-  4: {title: "Planning Cycle 4 (10 weeks) — Our Street, Our Story", weeks: CYCLE4_WEEKS, cells: CYCLE4_CELLS}
+  1: {title: "Planning Cycle 1 (10 weeks)", weeks: CYCLE1_WEEKS, cells: CYCLE1_CELLS},
+  2: {title: "Planning Cycle 2 (10 weeks)", weeks: CYCLE2_WEEKS, cells: CYCLE2_CELLS},
+  3: {title: "Planning Cycle 3 (10 weeks)", weeks: CYCLE3_WEEKS, cells: CYCLE3_CELLS},
+  4: {title: "Planning Cycle 4 (10 weeks)", weeks: CYCLE4_WEEKS, cells: CYCLE4_CELLS}
 };
 
 function phonicsHint(week){
@@ -1170,6 +1206,20 @@ function renderTabs(containerId){
   });
 }
 
+function cleanCycleTitles(){
+  let changed = false;
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    if(!c || !c.cycleTitle) return;
+    const dashIdx = c.cycleTitle.indexOf(" — ");
+    if(dashIdx >= 0){
+      c.cycleTitle = c.cycleTitle.slice(0, dashIdx);
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 function migrateSubjects(){
   const OLD_HWB_SUBJECT = "Health and Wellbeing";
   let changed = false;
@@ -1237,6 +1287,24 @@ function backfillBankThemes(){
   return changed;
 }
 
+function backfillBgeSplit(){
+  let changed = false;
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    if(!c) return;
+    const leadSubject = BGE_LEAD_SUBJECT_BY_CYCLE[n];
+    for(let wi=0; wi<c.weeks.length; wi++){
+      const combinedText = c.cells[cellKey(BGE_SUBJECT, wi)];
+      const leadKey = cellKey(leadSubject, wi);
+      if(combinedText && !c.cells[leadKey]){
+        c.cells[leadKey] = combinedText;
+        changed = true;
+      }
+    }
+  });
+  return changed;
+}
+
 async function loadState(){
   try{
     const res = await cloudStorage.get(STORAGE_KEY);
@@ -1246,7 +1314,9 @@ async function loadState(){
     }
     const migrated = migrateSubjects();
     const themed = backfillBankThemes();
-    if(migrated || themed) persist();
+    const bgeSplit = backfillBgeSplit();
+    const titlesCleaned = cleanCycleTitles();
+    if(migrated || themed || bgeSplit || titlesCleaned) persist();
     saveStatus.textContent = "Synced";
   }catch(e){
     saveStatus.textContent = "Starting fresh";
@@ -1288,7 +1358,7 @@ function render(){
     `).join('');
 
   const body = document.getElementById('bodyRows');
-  body.innerHTML = SUBJECTS.map(subject=>{
+  body.innerHTML = PLANNER_DISPLAY_SUBJECTS.map(subject=>{
     const cells = c.weeks.map((w,wi)=>{
       const text = c.cells[cellKey(subject,wi)] || "";
       const cls = text ? "cell-inner filled" : "cell-inner empty";
@@ -1341,16 +1411,17 @@ function renderBgeView(){
     `).join('');
 
   const body = document.getElementById('bgeBodyRows');
-  const subject = BGE_SUBJECT;
-  const cells = c.weeks.map((w,wi)=>{
-    const text = c.cells[cellKey(subject,wi)] || "";
-    const cls = text ? "cell-inner filled" : "cell-inner empty";
-    return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
+  body.innerHTML = BGE_SPLIT_SUBJECTS.map(subject=>{
+    const cells = c.weeks.map((w,wi)=>{
+      const text = c.cells[cellKey(subject,wi)] || "";
+      const cls = text ? "cell-inner filled" : "cell-inner empty";
+      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
+    }).join('');
+    return `<tr>
+      <td class="subject-cell">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
+      ${cells}
+    </tr>`;
   }).join('');
-  body.innerHTML = `<tr>
-    <td class="subject-cell">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
-    ${cells}
-  </tr>`;
 
   body.querySelectorAll('.cell-inner').forEach(el=>{
     el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
@@ -1687,8 +1758,8 @@ function getExportCellTextForCycle(c, cycleNum, subject, wi){
 
 function buildPrintView(){
   const c = cur();
-  let html = `<h1>${escapeHtml(c.cycleTitle)}</h1><h2>Class: ${escapeHtml(c.className)}</h2>`;
-  SUBJECTS.forEach(subject=>{
+  let html = `<h1>${escapeHtml(c.cycleTitle)}</h1>`;
+  PLANNER_DISPLAY_SUBJECTS.forEach(subject=>{
     html += `<div class="print-subject"><h3>${escapeHtml(subject)}</h3>`;
     const rows = [];
     let wi = 0;
@@ -1779,8 +1850,8 @@ async function downloadWordDoc(){
       dateCells.push(cell(text, {width: weekColWidth, fill: cycleLightHex, center:true, size:17}));
     }
     rows.push(new TableRow({ children: dateCells }));
-    SUBJECTS.forEach(subject=>{
-      const isShaded = subject === BGE_SUBJECT;
+    SUBJECTS.filter(s => s !== BGE_SUBJECT).forEach(subject=>{
+      const isShaded = false;
       const fill = isShaded ? GREY : undefined;
       const rowCells = [cell(subject, {width: SUBJECT_COL, fill, bold:true, size:17})];
       let wi = weekStart;
@@ -2032,7 +2103,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, BUNDLE2_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
@@ -2133,8 +2204,8 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
 
 document.getElementById('exportBtn').addEventListener('click', ()=>{
   const c = cur();
-  let out = `${c.cycleTitle} — ${c.className}\n\n`;
-  SUBJECTS.forEach(subject=>{
+  let out = `${c.cycleTitle}\n\n`;
+  PLANNER_DISPLAY_SUBJECTS.forEach(subject=>{
     out += subject + "\n";
     c.weeks.forEach((w,wi)=>{
       const text = c.cells[cellKey(subject,wi)];
