@@ -1347,12 +1347,14 @@ function renderChips(subject){
   const wrap = document.getElementById('cellChips');
   const none = document.getElementById('noChips');
 
-  const c = cur();
   const usedTexts = [];
-  for(let wi=0; wi<c.weeks.length; wi++){
-    const text = c.cells[cellKey(subject, wi)];
-    if(text) usedTexts.push(text);
-  }
+  [1,2,3,4].forEach(n=>{
+    const cyc = state.cycles[n];
+    for(let wi=0; wi<cyc.weeks.length; wi++){
+      const text = cyc.cells[cellKey(subject, wi)];
+      if(text) usedTexts.push(text);
+    }
+  });
   const currentDraft = document.getElementById('cellText').value;
   if(currentDraft) usedTexts.push(currentDraft);
   const isUsed = (itemText) => usedTexts.some(t => t.includes(itemText));
@@ -1367,7 +1369,7 @@ function renderChips(subject){
   if(available.length===0){
     wrap.innerHTML = "";
     none.style.display = "block";
-    none.textContent = "All saved curricular areas for this subject have been used somewhere in this cycle.";
+    none.textContent = "All saved curricular areas for this subject have been used somewhere across your cycles.";
     return;
   }
   none.style.display = "none";
