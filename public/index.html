@@ -274,6 +274,7 @@
         <button class="btn-ghost" id="wordBtn">Download as Word</button>
         <select id="coverageSubjectSelect" style="padding:8px 10px; border:1px solid var(--paper-line); border-radius:7px; font-family:inherit; font-size:13px;"></select>
         <button class="btn-ghost" id="coverageBtn">Download subject coverage (all cycles)</button>
+        <button class="btn-ghost" id="bankCoverageBtn">Download bank coverage (highlighted)</button>
         <button class="btn-ghost" id="resetBtn">Clear all entries</button>
         <button class="btn-ghost" id="loadLiteracyBtn">Load all curriculum plans</button>
         <button class="btn-ghost" id="loadCycle1Btn">Load full year plan (all 4 cycles)</button>
@@ -1852,6 +1853,97 @@ async function downloadSubjectCoverage(){
   }
 }
 document.getElementById('coverageBtn').addEventListener('click', downloadSubjectCoverage);
+
+/* Bank coverage export: full outcome bank for one subject, highlighted by which cycle(s) use each entry */
+async function downloadBankCoverage(){
+  if(!window.docx){
+    alert("Word export library hasn't loaded yet — check your connection and try again in a moment.");
+    return;
+  }
+  const { Document, Packer, Paragraph, TextRun, ShadingType } = window.docx;
+
+  const subject = coverageSelect.value;
+  const bank = state.banks[subject] || [];
+  if(bank.length === 0){
+    alert("No saved bank items for this subject yet — add some via \"Manage bank\" first.");
+    return;
+  }
+
+  const groups = {};
+  const untagged = [];
+  bank.forEach(item=>{
+    if(item.theme){
+      if(!groups[item.theme]) groups[item.theme] = [];
+      groups[item.theme].push(item);
+    }else{
+      untagged.push(item);
+    }
+  });
+
+  const children = [
+    new Paragraph({ children: [new TextRun({ text: `${subject} — Bank Coverage by Cycle`, bold: true, size: 28 })] }),
+    new Paragraph({ children: [new TextRun({ text: "Highlight colour shows which cycle each outcome has been planned in.", italics: true, size: 18 })] }),
+    new Paragraph({ children: [] })
+  ];
+
+  function addItem(item){
+    const usedCycles = cyclesUsingItem(subject, item.text);
+    let fill;
+    let suffix = "";
+    if(usedCycles.length === 1){
+      fill = hexNoHash(CYCLE_COLORS[usedCycles[0]]);
+    }else if(usedCycles.length > 1){
+      fill = hexNoHash(CYCLE_COLORS[usedCycles[0]]);
+      suffix = `  (also Cycle ${usedCycles.slice(1).join(', ')})`;
+    }
+    const runs = [new TextRun({ text: item.text, size: 19 })];
+    if(suffix) runs.push(new TextRun({ text: suffix, italics: true, size: 16 }));
+    children.push(new Paragraph({
+      shading: fill ? { type: ShadingType.CLEAR, fill } : undefined,
+      spacing: { after: 60 },
+      children: runs
+    }));
+  }
+
+  Object.keys(groups).forEach(theme=>{
+    children.push(new Paragraph({ children: [new TextRun({ text: theme, bold: true, size: 22 })], spacing: { before: 200, after: 80 } }));
+    groups[theme].forEach(addItem);
+  });
+  if(untagged.length){
+    if(Object.keys(groups).length){
+      children.push(new Paragraph({ children: [new TextRun({ text: "Other", bold: true, size: 22 })], spacing: { before: 200, after: 80 } }));
+    }
+    untagged.forEach(addItem);
+  }
+
+  children.push(new Paragraph({ children: [], spacing: { before: 300 } }));
+  children.push(new Paragraph({ children: [new TextRun({ text: "Legend", bold: true, size: 20 })], spacing: { after: 80 } }));
+  [1,2,3,4].forEach(n=>{
+    children.push(new Paragraph({
+      shading: { type: ShadingType.CLEAR, fill: hexNoHash(CYCLE_COLORS[n]) },
+      spacing: { after: 40 },
+      children: [new TextRun({ text: state.cycles[n].cycleTitle, size: 17 })]
+    }));
+  });
+
+  const doc = new Document({ sections: [{ children }] });
+
+  try{
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const safeName = subject.replace(/[^\w\s-]/g, '').trim() || 'bank-coverage';
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${safeName} - bank coverage.docx`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 30000);
+  }catch(e){
+    alert("Couldn't generate the Word document: " + (e.message || "unknown error"));
+  }
+}
+document.getElementById('bankCoverageBtn').addEventListener('click', downloadBankCoverage);
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
