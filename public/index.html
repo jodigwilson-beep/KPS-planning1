@@ -383,9 +383,9 @@
       <span></span>
     </div>
     <div class="modal-body">
-      <p style="font-size:13px; color:#5C5648; margin-top:0;">Your data syncs across devices using a personal key — no account needed. Generate a new key on your first device, then enter that same key on any other device to see the same data.</p>
+      <p style="font-size:13px; color:#5C5648; margin-top:0;">Your data syncs across devices using a personal key — no account needed. Generate a random key, or make up your own memorable phrase (like a password) — then enter that same key/phrase on any other device to see the same data.</p>
 
-      <div class="field-label">New here? Generate a key</div>
+      <div class="field-label">New here? Generate a random key</div>
       <button class="btn-primary" id="genKeyBtn">Generate a new sync key</button>
       <div id="newKeyBox" style="display:none; margin-top:12px; padding:12px; background:var(--paper); border:1px solid var(--paper-line); border-radius:8px;">
         <div class="field-label">Your key — save this somewhere safe (e.g. a password manager). It cannot be recovered if lost.</div>
@@ -393,9 +393,9 @@
         <button class="btn-primary" id="confirmNewKeyBtn" style="margin-top:10px;">I've saved it — continue</button>
       </div>
 
-      <div class="field-label" style="margin-top:20px;">Already have a key? Enter it</div>
-      <input type="text" id="existingKeyInput" placeholder="Paste your sync key">
-      <button class="btn-ghost" id="useExistingKeyBtn">Use this key</button>
+      <div class="field-label" style="margin-top:20px;">Or type your own phrase (16+ characters) — like a password you'll remember, or a key you've used before</div>
+      <input type="text" id="existingKeyInput" placeholder="e.g. KintoreP2Planning2026 (16+ characters)">
+      <button class="btn-ghost" id="useExistingKeyBtn">Use this key/phrase</button>
     </div>
   </div>
 </div>
@@ -479,7 +479,7 @@ document.getElementById('genKeyBtn').addEventListener('click', ()=>{
 });
 document.getElementById('useExistingKeyBtn').addEventListener('click', ()=>{
   const key = document.getElementById('existingKeyInput').value.trim();
-  if(key.length < 16){ alert('That key looks too short — check you copied it in full.'); return; }
+  if(key.length < 16){ alert('That needs to be at least 16 characters long — add a few more words or characters.'); return; }
   finishSyncSetup(key);
 });
 document.getElementById('syncSettingsBtn').addEventListener('click', ()=>{
@@ -1557,11 +1557,13 @@ async function downloadWordDoc(){
   const MARGIN = 720; // Word's standard "Narrow" preset (0.5in)
   const PAGE_LONG = 16838;
   const PAGE_SHORT = 11906;
-  const TOTAL_WIDTH = 14000;
+  const TOTAL_WIDTH = 15300; // fill the usable width now margins are narrow (16838 - 720*2 = 15398)
   const SUBJECT_COL = 2400;
   const weekColWidth = Math.floor((TOTAL_WIDTH - SUBJECT_COL) / 5);
   const actualTotal = SUBJECT_COL + weekColWidth * 5;
   const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
+  const FONT = "Arial";
+  const SINGLE_ROW_SUBJECTS_DOC = new Set(["Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
 
   function cell(text, opts={}){
     return new TableCell({
@@ -1572,7 +1574,7 @@ async function downloadWordDoc(){
       margins: CELL_MARGINS,
       children: [new Paragraph({
         alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
-        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 18 })]
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 18, font: FONT })]
       })]
     });
   }
@@ -1596,6 +1598,19 @@ async function downloadWordDoc(){
     }
     rows.push(new TableRow({ children: dateCells }));
     SUBJECTS.filter(s => s !== BGE_SUBJECT).forEach(subject=>{
+      if(!SINGLE_ROW_SUBJECTS_DOC.has(subject)){
+        const liSubject = liSubjectKey(subject);
+        const liRowCells = [cell(subject + " — Learning Intention", {width: SUBJECT_COL, bold:true, size:17})];
+        let liWi = weekStart;
+        while(liWi <= weekEnd){
+          const liText = getExportCellText(c, liSubject, liWi);
+          let liSpan = 1;
+          while(liWi + liSpan <= weekEnd && getExportCellText(c, liSubject, liWi + liSpan) === liText) liSpan++;
+          liRowCells.push(cell(liText, {width: weekColWidth*liSpan, span: liSpan, size:17}));
+          liWi += liSpan;
+        }
+        rows.push(new TableRow({ children: liRowCells }));
+      }
       const isShaded = false;
       const fill = isShaded ? GREY : undefined;
       const rowCells = [cell(subject, {width: SUBJECT_COL, fill, bold:true, size:17})];
@@ -1665,12 +1680,13 @@ async function downloadSubjectCoverage(){
   const MARGIN = 720; // Word's standard "Narrow" preset (0.5in)
   const PAGE_LONG = 16838;
   const PAGE_SHORT = 11906;
-  const TOTAL_WIDTH = 14000;
+  const TOTAL_WIDTH = 15300;
   const LABEL_COL = 2600;
   const weekColWidth = Math.floor((TOTAL_WIDTH - LABEL_COL) / 5);
   const actualTotal = LABEL_COL + weekColWidth * 5;
   const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
   const HEADER_COLOR = "0F7A73";
+  const FONT = "Arial";
 
   function cell(text, opts={}){
     return new TableCell({
@@ -1681,7 +1697,7 @@ async function downloadSubjectCoverage(){
       margins: CELL_MARGINS,
       children: [new Paragraph({
         alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
-        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 18, color: opts.color })]
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 18, color: opts.color, font: FONT })]
       })]
     });
   }
@@ -1783,7 +1799,7 @@ async function downloadBankCoverage(){
 
   const children = [
     new Paragraph({ children: [new TextRun({ text: `${subject} — Bank Coverage by Cycle`, bold: true, size: 28 })] }),
-    new Paragraph({ children: [new TextRun({ text: "Highlight colour shows which cycle each outcome has been planned in.", italics: true, size: 18 })] }),
+    new Paragraph({ children: [new TextRun({ text: "Highlight colour shows which cycle each outcome has been planned in.", italics: true, size: 18 , font: "Arial" })] }),
     new Paragraph({ children: [] })
   ];
 
@@ -1797,8 +1813,8 @@ async function downloadBankCoverage(){
       fill = hexNoHash(CYCLE_COLORS[usedCycles[0]]);
       suffix = `  (also Cycle ${usedCycles.slice(1).join(', ')})`;
     }
-    const runs = [new TextRun({ text: item.text, size: 19 })];
-    if(suffix) runs.push(new TextRun({ text: suffix, italics: true, size: 16 }));
+    const runs = [new TextRun({ text: item.text, size: 19 , font: "Arial" })];
+    if(suffix) runs.push(new TextRun({ text: suffix, italics: true, size: 16 , font: "Arial" }));
     children.push(new Paragraph({
       shading: fill ? { type: ShadingType.CLEAR, fill } : undefined,
       spacing: { after: 60 },
@@ -1807,23 +1823,23 @@ async function downloadBankCoverage(){
   }
 
   Object.keys(groups).forEach(theme=>{
-    children.push(new Paragraph({ children: [new TextRun({ text: theme, bold: true, size: 22 })], spacing: { before: 200, after: 80 } }));
+    children.push(new Paragraph({ children: [new TextRun({ text: theme, bold: true, size: 22 , font: "Arial" })], spacing: { before: 200, after: 80 } }));
     groups[theme].forEach(addItem);
   });
   if(untagged.length){
     if(Object.keys(groups).length){
-      children.push(new Paragraph({ children: [new TextRun({ text: "Other", bold: true, size: 22 })], spacing: { before: 200, after: 80 } }));
+      children.push(new Paragraph({ children: [new TextRun({ text: "Other", bold: true, size: 22 , font: "Arial" })], spacing: { before: 200, after: 80 } }));
     }
     untagged.forEach(addItem);
   }
 
   children.push(new Paragraph({ children: [], spacing: { before: 300 } }));
-  children.push(new Paragraph({ children: [new TextRun({ text: "Legend", bold: true, size: 20 })], spacing: { after: 80 } }));
+  children.push(new Paragraph({ children: [new TextRun({ text: "Legend", bold: true, size: 20 , font: "Arial" })], spacing: { after: 80 } }));
   [1,2,3,4].forEach(n=>{
     children.push(new Paragraph({
       shading: { type: ShadingType.CLEAR, fill: hexNoHash(CYCLE_COLORS[n]) },
       spacing: { after: 40 },
-      children: [new TextRun({ text: state.cycles[n].cycleTitle, size: 17 })]
+      children: [new TextRun({ text: state.cycles[n].cycleTitle, size: 17 , font: "Arial" })]
     }));
   });
 
