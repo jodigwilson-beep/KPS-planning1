@@ -634,6 +634,29 @@ const PE_SEED = {
   ]
 };
 
+const ETHOS_SEED = {
+  "Ethos and Life of the School": {
+    "Self-Management": [
+      "Focussing: I can remain focused on a task by not responding to distractions, and identify the exact resources I need for a task.",
+      "Integrity: I can understand and follow rules in play and games, and recognise that other people may have different values or ideas from me, compromising when needed.",
+      "Adapting: I can ask and answer questions to deepen my understanding and help me adapt how I play and learn, and think creatively about solutions through trial and error.",
+      "Initiative: I can break tasks into smaller steps so I can plan what to do next, and keep going and complete a task even when it is challenging."
+    ],
+    "Social Intelligence": [
+      "Communicating: I can communicate with growing confidence in different ways, both verbally and digitally, and listen to others, sharing my ideas and experiences.",
+      "Feeling: I can recognise and respect other people's feelings and emotions, and show kindness, understanding that my actions can affect how others feel.",
+      "Collaborating: I can take turns and work with a group to complete a task, and listen to and value other people's opinions.",
+      "Leading: I can work with a group to use ideas and create solutions to problems, and try out different roles in group work."
+    ],
+    "Innovation": [
+      "Curiosity: I can ask and answer questions to deepen my understanding, and use research skills to find information that increases my understanding and enjoyment.",
+      "Creativity: I can listen to and share ideas and experiences, showing curiosity when trying new tasks, and experiment with and investigate real-life issues.",
+      "Sense-making: I can recognise patterns and anomalies and make my own patterns, and identify similarities, making comparisons and noticing connections.",
+      "Critical Thinking: I can ask focused questions to clarify what needs to be done and to help me plan and set goals, and begin to test my predictions and look for evidence."
+    ]
+  }
+};
+
 const RME_SEED = {
   "Health and Wellbeing / RME": {
     "Values, Fairness & Community": [
@@ -988,7 +1011,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -1834,7 +1857,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
