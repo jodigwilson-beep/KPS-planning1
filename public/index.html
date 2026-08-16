@@ -171,6 +171,9 @@
   }
   td.subject-cell.stripe-b{background:#F0EAD8;}
   .li-row td.subject-cell{border-bottom:none; padding-bottom:4px;}
+  .li-row-standalone td.subject-cell{border-bottom:1px solid var(--paper-line); background:var(--ochre-soft);}
+  .li-row-standalone td.cell{border-bottom:1px solid var(--paper-line);}
+  .li-row-standalone .cell-inner.filled{background:#FFF9F0;}
   .ca-row td.subject-cell{padding-top:4px; font-size:12px; font-weight:400; opacity:0.85;}
   .li-label{display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--ochre); margin-top:2px;}
   td.cell{
@@ -1186,32 +1189,31 @@ function renderBgeView(){
     `).join('');
 
   const body = document.getElementById('bgeBodyRows');
-  body.innerHTML = BGE_SPLIT_SUBJECTS.map((subject, idx)=>{
+  const bgeLiSubject = liSubjectKey(BGE_SUBJECT);
+  const liCells = c.weeks.map((w,wi)=>{
+    const text = c.cells[cellKey(bgeLiSubject,wi)] || "";
+    const cls = text ? "cell-inner filled" : "cell-inner empty";
+    return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(bgeLiSubject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
+  }).join('');
+  const liRow = `<tr class="li-row-standalone">
+    <td class="subject-cell">Learning Intention<span style="display:block; font-size:10.5px; font-weight:400; opacity:0.8; margin-top:2px;">Cross-curricular links across all four areas</span><span class="bank-link" data-subject="${escapeAttr(bgeLiSubject)}">Manage bank →</span></td>
+    ${liCells}
+  </tr>`;
+
+  const caRows = BGE_SPLIT_SUBJECTS.map((subject, idx)=>{
     const stripe = idx % 2 === 0 ? 'stripe-a' : 'stripe-b';
-    const liSubject = liSubjectKey(subject);
-
-    const liCells = c.weeks.map((w,wi)=>{
-      const text = c.cells[cellKey(liSubject,wi)] || "";
-      const cls = text ? "cell-inner filled" : "cell-inner empty";
-      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(liSubject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
-    }).join('');
-    const liRow = `<tr class="li-row">
-      <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="li-label">Learning Intention</span><span class="bank-link" data-subject="${escapeAttr(liSubject)}">Manage bank →</span></td>
-      ${liCells}
-    </tr>`;
-
     const caCells = c.weeks.map((w,wi)=>{
       const text = c.cells[cellKey(subject,wi)] || "";
       const cls = text ? "cell-inner compact filled" : "cell-inner compact empty";
       return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(truncate(text,70)) : "+ add"}</div></td>`;
     }).join('');
-    const caRow = `<tr class="ca-row">
+    return `<tr class="ca-row">
       <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
       ${caCells}
     </tr>`;
-
-    return liRow + caRow;
   }).join('');
+
+  body.innerHTML = liRow + caRows;
 
   body.querySelectorAll('.cell-inner').forEach(el=>{
     el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
