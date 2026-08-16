@@ -1640,7 +1640,7 @@ async function downloadWordDoc(){
     SUBJECTS.filter(s => s !== BGE_SUBJECT).forEach(subject=>{
       if(!SINGLE_ROW_SUBJECTS_DOC.has(subject)){
         const liSubject = liSubjectKey(subject);
-        const liRowCells = [cell(subject + " — Learning Intention", {width: SUBJECT_COL, bold:true, size:17})];
+        const liRowCells = [cell(subject, {width: SUBJECT_COL, bold:true, size:17})];
         let liWi = weekStart;
         while(liWi <= weekEnd){
           const liText = getExportCellText(c, liSubject, liWi);
@@ -1650,6 +1650,7 @@ async function downloadWordDoc(){
           liWi += liSpan;
         }
         rows.push(new TableRow({ children: liRowCells }));
+        return;
       }
       const isShaded = false;
       const fill = isShaded ? GREY : undefined;
