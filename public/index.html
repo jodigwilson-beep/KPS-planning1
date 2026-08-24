@@ -1332,10 +1332,14 @@ function backfillBgeSplit(){
     if(!c) return;
     const leadSubject = BGE_LEAD_SUBJECT_BY_CYCLE[n];
     for(let wi=0; wi<c.weeks.length; wi++){
-      const combinedText = c.cells[cellKey(BGE_SUBJECT, wi)];
+      const combinedKey = cellKey(BGE_SUBJECT, wi);
+      const combinedText = c.cells[combinedKey];
       const leadKey = cellKey(leadSubject, wi);
-      if(combinedText && !c.cells[leadKey]){
-        c.cells[leadKey] = combinedText;
+      if(combinedText){
+        if(!c.cells[leadKey]){
+          c.cells[leadKey] = combinedText;
+        }
+        delete c.cells[combinedKey];
         changed = true;
       }
     }
