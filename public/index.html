@@ -176,6 +176,20 @@
   .li-row-standalone .cell-inner.filled{background:#FFF9F0;}
   .ca-row td.subject-cell{padding-top:4px; font-size:12px; font-weight:400; opacity:0.85;}
   .li-label{display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--ochre); margin-top:2px;}
+
+  .weekly-day-card{background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius); margin-bottom:16px; overflow:hidden;}
+  .weekly-day-card h3{
+    background:var(--board); color:var(--chalk); font-family:'Quicksand',sans-serif; font-size:15px;
+    margin:0; padding:8px 14px;
+  }
+  table.weekly-day-table{width:100%; border-collapse:collapse;}
+  table.weekly-day-table td{border-bottom:1px solid var(--paper-line); padding:8px 12px; vertical-align:top; font-size:12.5px;}
+  table.weekly-day-table tr:last-child td{border-bottom:none;}
+  td.wk-time{width:90px; font-weight:700; color:var(--board); white-space:nowrap;}
+  td.wk-activity{width:170px; font-weight:700;}
+  td.wk-ref{width:30%; color:#6B6252; font-style:italic;}
+  td.wk-detail{width:auto;}
+  td.wk-detail .cell-inner{min-height:32px; padding:4px 8px; border-radius:6px;}
   td.cell{
     border-bottom:1px solid var(--paper-line); border-right:1px solid var(--paper-line); padding:0;
     vertical-align:top; min-width:190px; max-width:220px;
@@ -245,6 +259,7 @@
     <button class="nav-link active" data-view="home">Home</button>
     <button class="nav-link" data-view="planner">P2K 26-27 Ten Week Plans</button>
     <button class="nav-link" data-view="bge">P2K 26-27 BGE/Topics</button>
+    <button class="nav-link" data-view="weekly">P2K 26-27 Weekly Plan</button>
     <button class="nav-link" id="syncSettingsBtn">🔑 Sync</button>
 
     <div class="nav-divider"></div>
@@ -273,6 +288,11 @@
           <h2>P2K 26-27 BGE/Topics</h2>
           <p>A focused view of just the Expressive Arts / Sciences / Social Studies / Technologies row across all four cycles.</p>
           <span class="go">Open P2K 26-27 BGE/Topics →</span>
+        </button>
+        <button class="tool-card" data-goto="weekly">
+          <h2>P2K 26-27 Weekly Plan</h2>
+          <p>Your day-by-day timetable for a single week, with that week's focus pulled in from the Ten-Week Planner and space for your own daily detail.</p>
+          <span class="go">Open Weekly Plan →</span>
         </button>
       </div>
     </section>
@@ -317,6 +337,23 @@
           <tbody id="bgeBodyRows"></tbody>
         </table>
       </div>
+    </section>
+
+    <!-- WEEKLY PLAN -->
+    <section id="view-weekly" class="hub-view">
+      <header>
+        <h1 id="weeklyCycleTitle" style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">Planning Cycle</h1>
+        <p style="margin:0; opacity:0.85;">Your day-by-day timetable, with that week's focus pulled in from the Ten-Week Planner.</p>
+      </header>
+
+      <div class="cycle-tabs" id="weeklyCycleTabs"></div>
+
+      <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <label for="weeklyWeekSelect" style="font-weight:700; font-size:13px;">Week:</label>
+        <select id="weeklyWeekSelect" style="padding:7px 10px; border-radius:7px; border:1px solid var(--paper-line); font-family:inherit; font-size:13px;"></select>
+      </div>
+
+      <div id="weeklyBody"></div>
     </section>
 
   </main>
@@ -681,9 +718,72 @@ const WRITING_LI_SEED = {
 
 const BGE_LI_SEED = {
   [liSubjectKey(BGE_SUBJECT)]: {
-    "Cycle 1 — Toy Detectives": [
-      "Recount: The day I discovered how my toy moves.",
-      "Retell: Retell how we tested magnets in class."
+    "Block 1 — Autumn/Harvest": [
+      "Cross-curricular: Explore harvest/autumn changes in nature, linking recount writing to seasonal observation."
+    ],
+    "Block 2 — Minibeasts": [
+      "Cross-curricular: Investigate minibeast habitats, linking survey/interview writing to science observation."
+    ],
+    "Block 3 — Fairytales / Superheroes": [
+      "Cross-curricular: Explore story structure through fairytales, extending into superhero narrative writing."
+    ],
+    "Superhero Design-Challenge Week": [
+      "Cross-curricular: Design and build a superhero gadget (Expressive Arts + Technologies), then write instructions or a persuasive pitch (Literacy)."
+    ],
+    "Block 4 — Under the Sea": [
+      "Cross-curricular: Explore ocean habitats and creatures, linking senses poetry to sea-life descriptions."
+    ],
+    "Science Week": [
+      "Cross-curricular: Investigate forces, magnets, dissolving and materials through hands-on experiments (Sciences + Technologies), then recount findings in writing (Literacy)."
+    ],
+    "Block 5 — Weather": [
+      "Cross-curricular: Study weather patterns and seasons, linking fact files and reports to science observation."
+    ],
+    "Block 6 — Pets": [
+      "Cross-curricular: Explore pet care and responsibility, linking instructions and persuasive writing to real-life application."
+    ],
+    "Block 7 — Revision": [
+      "Cross-curricular: Revisit and polish a favourite piece of writing from across the year's topics."
+    ]
+  }
+};
+
+const LITERACY_BGE_SEED = {
+  "Literacy": {
+    "Block 1 — Autumn/Harvest (Recount)": [
+      "Diary: A day during Autumn/Harvest time. (LIT 1-25a, LIT 1-26a)",
+      "Recount: Personal experience of a harvest or autumn activity. (LIT 1-29a, ENG 1-30a)"
+    ],
+    "Block 2 — Minibeasts (Inquire/Socialise)": [
+      "Survey: Ask classmates about their favourite minibeast. (LIT 1-25a, LIT 1-26a)",
+      "Interview: Interview a partner about a minibeast they've found. (ENG 1-31a)",
+      "Message: Write a message about a minibeast discovery. (LIT 1-29a)"
+    ],
+    "Block 3 — Fairytales / Superheroes (Narrative)": [
+      "Narrative: Write a fairytale story with a twist. (LIT 1-29a, ENG 1-31a)",
+      "Narrative (bonus): A superhero adventure story. (ENG 1-31a)"
+    ],
+    "Superhero Design-Challenge Week": [
+      "Instructions: How-to guide for your superhero gadget. (LIT 1-26a)",
+      "Persuasive: Pitch your gadget idea to the class. (LIT 1-29a)"
+    ],
+    "Block 4 — Under the Sea (Narrative Poetry)": [
+      "Senses poem: Describe an underwater scene using the five senses. (LIT 1-29a)",
+      "Acrostic: OCEAN or SEA. (ENG 1-31a)"
+    ],
+    "Science Week": [
+      "Short recount, report or instructions from a Science Week experiment. (LIT 1-25a, LIT 1-26a)"
+    ],
+    "Block 5 — Weather (Describe/Explain)": [
+      "Fact file: Weather types and seasons. (LIT 1-25a, LIT 1-26a)",
+      "Report: Report on a weather event, e.g. a storm. (LIT 1-29a)"
+    ],
+    "Block 6 — Pets (Instruct/Persuade)": [
+      "Instructions: How to look after a pet. (LIT 1-26a)",
+      "Persuasive leaflet: Persuade your family to get a pet. (LIT 1-29a)"
+    ],
+    "Block 7 — Revision": [
+      "Consolidation: Choose your best piece from the year and polish it into a final draft. (LIT 1-22a, LIT 1-23a)"
     ]
   }
 };
@@ -774,7 +874,7 @@ const BUNDLE2_SEED = {
 const BUNDLE2_CONTEXTS = "Suggested contexts: Water (flooding), Transport, Enterprise (textiles design), Development of Technology (Inventors); Other: Winter/Arctic theme, Mapping, Sustainability, Toys & Games.";
 
 /* BGE / Topics view: the combined lane split into its four original areas */
-const BGE_SPLIT_SUBJECTS = ["Expressive Arts", "Sciences", "Social Studies", "Technologies", "Meta Skills"];
+const BGE_SPLIT_SUBJECTS = ["Literacy", "Expressive Arts", "Sciences", "Social Studies", "Technologies", "Meta Skills"];
 const BGE_LEAD_SUBJECT_BY_CYCLE = { 1: "Sciences", 2: "Expressive Arts", 3: "Technologies", 4: "Social Studies" };
 const BUNDLE2_SPLIT_SEED = {
   "Expressive Arts": [
@@ -796,7 +896,8 @@ const BUNDLE2_SPLIT_SEED = {
     "SOC 1-06a: Consider ways of looking after my school or community and encourage others to care for their environment.",
     "SOC 1-08a: By exploring my community and the groups within it, identify and consider different types of housing and how they meet needs.",
     "SOC 1-11a: Through activities in my local area, develop my mental map and sense of place, and create and use maps of the area.",
-    "SOC 1-14a: Develop an understanding of the importance of local organisations in providing for the needs of my local community."
+    "SOC 1-14a: Develop an understanding of the importance of local organisations in providing for the needs of my local community.",
+    "Gap check: SOC 1-11a is not currently covered by the topic/writing blocks plan — consider a tie-in during a Scotland/Local Area topic, or as a one-off lesson."
   ],
   "Technologies": [
     "TCH 1-04a: Use a range of simple food preparation techniques when working with food.",
@@ -1084,7 +1185,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -1242,6 +1343,7 @@ function render(){
   });
 
   renderBgeView();
+  renderWeeklyView();
 }
 
 function renderBgeView(){
@@ -1294,6 +1396,136 @@ function renderBgeView(){
   });
   body.querySelectorAll('.bank-link').forEach(el=>{
     el.addEventListener('click', ()=>openBankManager(el.dataset.subject));
+  });
+}
+
+/* ============ WEEKLY PLAN (day-by-day timetable) ============ */
+const WEEKLY_TIMETABLE = {
+  "Mon": [
+    { time: "9-10.30", activities: [
+      { label: "Reading", subject: "Literacy – Reading" },
+      { label: "Phonics input/task", subject: "Literacy – Spelling/Phonics" }
+    ]},
+    { time: "10.45-12.15", activities: [
+      { label: "Maths Topic", subject: "Mathematics" },
+      { label: "Grammar/sentence work", subject: "Literacy – Grammar" }
+    ]},
+    { time: "1-3", activities: [
+      { label: "P.E (small hall) 2-3", subject: "P.E" }
+    ]}
+  ],
+  "Tues": [
+    { time: "9-10.30", activities: [
+      { label: "Loose Parts", subject: null },
+      { label: "Handwriting", subject: "Literacy – Handwriting" }
+    ]},
+    { time: "10.45-12.15", activities: [
+      { label: "Daily mile", subject: null },
+      { label: "Numeracy", subject: "Numeracy (Big Maths CLIC)" }
+    ]},
+    { time: "1-3", activities: [
+      { label: "Continuous provision", subject: null },
+      { label: "Reading skills/pre-writing task", subject: "Literacy – Reading" }
+    ]}
+  ],
+  "Wed": [
+    { time: "9-10.30", activities: [
+      { label: "Taught writing", subject: "Literacy – Writing" },
+      { label: "Numeracy", subject: "Numeracy (Big Maths CLIC)" }
+    ]},
+    { time: "10.45-12.15", activities: [
+      { label: "Daily mile", subject: null },
+      { label: "Assembly", subject: "Ethos and Life of the School" }
+    ]},
+    { time: "1-3", activities: [
+      { label: "Continuous provision", subject: null },
+      { label: "Phonics", subject: "Literacy – Spelling/Phonics" }
+    ]}
+  ],
+  "Thurs": [
+    { time: "9-10.30", activities: [
+      { label: "Phonics", subject: "Literacy – Spelling/Phonics" },
+      { label: "Soft start", subject: null }
+    ]},
+    { time: "10.45-12.15", activities: [
+      { label: "Reading", subject: "Literacy – Reading" },
+      { label: "Numeracy", subject: "Numeracy (Big Maths CLIC)" }
+    ]},
+    { time: "1-3", activities: [
+      { label: "H&W", subject: "Health and Wellbeing / RME" },
+      { label: "P.E (big hall) 1-2", subject: "P.E" },
+      { label: "Continuous provision", subject: null }
+    ]}
+  ],
+  "Fri": [
+    { time: "9-10.30", activities: [
+      { label: "Spelling", subject: "Literacy – Spelling/Phonics" },
+      { label: "Reading", subject: "Literacy – Reading" }
+    ]},
+    { time: "10.45-12.15", activities: [
+      { label: "Numeracy", subject: "Numeracy (Big Maths CLIC)" },
+      { label: "Daily mile", subject: null }
+    ]},
+    { time: "1-3", activities: [
+      { label: "BGE", subject: BGE_SUBJECT },
+      { label: "Continuous provision", subject: null }
+    ]}
+  ]
+};
+
+function dailyDetailKey(day, label){
+  return `${day} · ${label} — Daily Detail`;
+}
+
+function renderWeeklyView(){
+  renderTabs('weeklyCycleTabs');
+  const c = cur();
+  const weeklyHeaderEl = document.querySelector('#view-weekly header');
+  weeklyHeaderEl.className = 'c' + state.activeCycle;
+  document.getElementById('weeklyCycleTitle').textContent = c.cycleTitle;
+
+  const weekSelect = document.getElementById('weeklyWeekSelect');
+  const desiredOptions = c.weeks.map((w,i)=>`<option value="${i}">Week ${i+1} (${escapeHtml(w.date)})</option>`).join('');
+  if(weekSelect.dataset.cycle !== String(state.activeCycle) || weekSelect.innerHTML !== desiredOptions){
+    const prevValue = weekSelect.value;
+    weekSelect.innerHTML = desiredOptions;
+    weekSelect.dataset.cycle = String(state.activeCycle);
+    if(prevValue && parseInt(prevValue) < c.weeks.length) weekSelect.value = prevValue;
+  }
+  const wi = parseInt(weekSelect.value || 0);
+
+  const days = ["Mon","Tues","Wed","Thurs","Fri"];
+  const body = document.getElementById('weeklyBody');
+  body.innerHTML = days.map(day=>{
+    const periods = WEEKLY_TIMETABLE[day];
+    const rows = periods.map(period=>{
+      return period.activities.map(act=>{
+        let refText = "—";
+        if(act.subject){
+          const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
+          const ca = act.subject !== BGE_SUBJECT ? (c.cells[cellKey(act.subject, wi)] || "") : "";
+          const parts = [li, ca].filter(Boolean);
+          if(parts.length) refText = parts.join(" · ");
+        }
+        const dKey = dailyDetailKey(day, act.label);
+        const detailText = c.cells[cellKey(dKey, wi)] || "";
+        const cls = detailText ? "cell-inner filled" : "cell-inner empty";
+        return `<tr>
+          <td class="wk-time">${escapeHtml(period.time)}</td>
+          <td class="wk-activity">${escapeHtml(act.label)}</td>
+          <td class="wk-ref">${escapeHtml(refText)}</td>
+          <td class="wk-detail"><div class="${cls}" data-subject="${escapeAttr(dKey)}" data-wi="${wi}">${detailText ? escapeHtml(detailText) : "+ add detail"}</div></td>
+        </tr>`;
+      }).join('');
+    }).join('');
+    return `<div class="weekly-day-card">
+      <h3>${day}</h3>
+      <table class="weekly-day-table"><tbody>${rows}</tbody></table>
+    </div>`;
+  }).join('');
+
+  body.querySelectorAll('.cell-inner').forEach(el=>{
+    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
   });
 }
 
@@ -1759,6 +1991,8 @@ async function downloadWordDoc(){
 }
 document.getElementById('wordBtn').addEventListener('click', downloadWordDoc);
 
+document.getElementById('weeklyWeekSelect').addEventListener('change', renderWeeklyView);
+
 /* Subject-coverage export: all 4 cycles for one subject, color-coded by cycle */
 const coverageSelect = document.getElementById('coverageSubjectSelect');
 coverageSelect.innerHTML = SUBJECTS.map(s=>`<option value="${escapeAttr(s)}">${escapeHtml(s)}</option>`).join('');
@@ -1967,7 +2201,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
