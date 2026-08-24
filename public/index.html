@@ -788,6 +788,125 @@ const LITERACY_BGE_SEED = {
   }
 };
 
+const TOPIC_TASKS_BGE_SEED = {
+  "Expressive Arts": {
+    "Block 1 — Autumn/Harvest": [
+      "Create autumn-themed artwork using natural materials — leaves, conkers, twigs. (EXA 1-06a)"
+    ],
+    "Block 2 — Minibeasts": [
+      "Compose a minibeast movement dance — bug crawls, bee buzzes, butterfly flutters. (EXA 1-10a)"
+    ],
+    "Block 3 — Fairytales / Superheroes": [
+      "Act out a fairytale scene through drama, or create a superhero freeze-frame. (EXA 1-13a, EXA 1-14a)"
+    ],
+    "Superhero Design-Challenge Week": [
+      "Design and decorate a superhero mask or costume piece. (EXA 1-06a)"
+    ],
+    "Block 4 — Under the Sea": [
+      "Create an underwater soundscape using instruments or body percussion. (EXA 1-17a)"
+    ],
+    "Block 5 — Weather": [
+      "Compose a 'weather music' piece — rain patterns, thunder rhythms, wind sounds. (EXA 1-17a)"
+    ],
+    "Block 6 — Pets": [
+      "Role-play looking after a pet through drama and improvisation. (EXA 1-13a)"
+    ],
+    "Block 7 — Revision": [
+      "Perform or present your favourite piece from the year to the class."
+    ]
+  },
+  "Sciences": {
+    "Block 1 — Autumn/Harvest": [
+      "Investigate how and why leaves change colour and fall in autumn."
+    ],
+    "Block 2 — Minibeasts": [
+      "Observe and classify minibeasts found in the school grounds — sort by features."
+    ],
+    "Block 4 — Under the Sea": [
+      "Investigate buoyancy — test which objects float or sink and why."
+    ],
+    "Science Week": [
+      "Forces: Test how far different toy cars roll down a ramp. (SCN 1-07a)",
+      "Magnets: Sort classroom objects into magnetic and non-magnetic. (SCN 1-08a)",
+      "Dissolving: Test which materials dissolve in water — sugar, sand, salt. (SCN 1-16a)",
+      "Materials: Choose the best material to build a waterproof shelter for a teddy. (SCN 1-15a)"
+    ],
+    "Block 5 — Weather": [
+      "Set up a class weather station — record temperature, rainfall and wind daily."
+    ],
+    "Block 6 — Pets": [
+      "Investigate what different pets need to stay healthy — food, exercise, shelter."
+    ]
+  },
+  "Social Studies": {
+    "Block 1 — Autumn/Harvest": [
+      "Explore harvest festivals and traditions from different cultures. (SOC 1-04a)"
+    ],
+    "Block 3 — Fairytales / Superheroes": [
+      "Compare fairytales from different countries and cultures."
+    ],
+    "Block 4 — Under the Sea": [
+      "Explore where in the world coral reefs and oceans are, and who depends on them."
+    ],
+    "Block 5 — Weather": [
+      "Compare weather and seasons in Scotland with another country."
+    ],
+    "Block 6 — Pets": [
+      "Discuss local organisations that help pets, e.g. the SSPCA. (SOC 1-14a)",
+      "Create a mental map of pet shops or vets in the local area. (SOC 1-11a)"
+    ]
+  },
+  "Technologies": {
+    "Block 1 — Autumn/Harvest": [
+      "Prepare a simple harvest recipe, e.g. apple crumble, using food preparation skills. (TCH 1-04a)"
+    ],
+    "Block 2 — Minibeasts": [
+      "Build a minibeast hotel using natural or recycled materials. (TCH 1-04c, TCH 1-04d)"
+    ],
+    "Superhero Design-Challenge Week": [
+      "Build and test a superhero gadget prototype. (TCH 1-04b, TCH 1-04d)"
+    ],
+    "Science Week": [
+      "Program a simple sequence using a visual programming app, e.g. Scratch Jr or Beebots. (TCH 1-14a, TCH 1-15a)"
+    ],
+    "Block 5 — Weather": [
+      "Design and test a simple weatherproof shelter model."
+    ],
+    "Block 6 — Pets": [
+      "Design and make a simple pet toy using textiles. (TCH 1-04b)"
+    ]
+  },
+  "Meta Skills": {
+    "Block 1 — Autumn/Harvest": [
+      "Focussing: Stay on task while sorting and classifying harvest items."
+    ],
+    "Block 2 — Minibeasts": [
+      "Curiosity: Ask questions about minibeast habitats and behaviours."
+    ],
+    "Block 3 — Fairytales / Superheroes": [
+      "Creativity: Retell a fairytale with a new twist."
+    ],
+    "Superhero Design-Challenge Week": [
+      "Initiative: Plan and build your gadget independently, adapting when it doesn't work."
+    ],
+    "Block 4 — Under the Sea": [
+      "Collaborating: Work in a group to create an under-the-sea display."
+    ],
+    "Science Week": [
+      "Sense-making: Record and compare results from experiments."
+    ],
+    "Block 5 — Weather": [
+      "Critical Thinking: Predict tomorrow's weather using evidence."
+    ],
+    "Block 6 — Pets": [
+      "Feeling: Discuss how to show kindness and responsibility caring for a pet."
+    ],
+    "Block 7 — Revision": [
+      "Adapting: Reflect on and improve your best piece of work from the year."
+    ]
+  }
+};
+
 const ETHOS_SEED = {
   "Ethos and Life of the School": {
     "Self-Management": [
@@ -1185,7 +1304,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, TOPIC_TASKS_BGE_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -2203,7 +2322,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, TOPIC_TASKS_BGE_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
