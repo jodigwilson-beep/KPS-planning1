@@ -1501,7 +1501,7 @@ function renderBgeView(){
       const startDate = globalWeekDate(block.weekStart);
       const endDate = globalWeekDate(block.weekEnd);
       const dateLabel = block.weekStart === block.weekEnd ? startDate : [startDate, endDate].filter(Boolean).join(' – ');
-      return `<th style="background:${tint};">
+      return `<th style="background:${tint}; color:#000;">
         ${escapeHtml(label)}
         <span style="display:block; font-size:10.5px; opacity:0.8; font-weight:400;">${weekLabel} · Cycle ${cycleNum}</span>
         ${dateLabel ? `<span style="display:block; font-size:10px; opacity:0.75; font-weight:400;">${escapeHtml(dateLabel)}</span>` : ''}
