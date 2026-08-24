@@ -750,46 +750,6 @@ const BGE_LI_SEED = {
   }
 };
 
-const LITERACY_BGE_SEED = {
-  "Literacy": {
-    "Block 1 — Autumn/Harvest (Recount)": [
-      "Diary: A day during Autumn/Harvest time. (LIT 1-25a, LIT 1-26a)",
-      "Recount: Personal experience of a harvest or autumn activity. (LIT 1-29a, ENG 1-30a)"
-    ],
-    "Block 2 — Minibeasts (Inquire/Socialise)": [
-      "Survey: Ask classmates about their favourite minibeast. (LIT 1-25a, LIT 1-26a)",
-      "Interview: Interview a partner about a minibeast they've found. (ENG 1-31a)",
-      "Message: Write a message about a minibeast discovery. (LIT 1-29a)"
-    ],
-    "Block 3 — Fairytales / Superheroes (Narrative)": [
-      "Narrative: Write a fairytale story with a twist. (LIT 1-29a, ENG 1-31a)",
-      "Narrative (bonus): A superhero adventure story. (ENG 1-31a)"
-    ],
-    "Superhero Design-Challenge Week": [
-      "Instructions: How-to guide for your superhero gadget. (LIT 1-26a)",
-      "Persuasive: Pitch your gadget idea to the class. (LIT 1-29a)"
-    ],
-    "Block 4 — Under the Sea (Narrative Poetry)": [
-      "Senses poem: Describe an underwater scene using the five senses. (LIT 1-29a)",
-      "Acrostic: OCEAN or SEA. (ENG 1-31a)"
-    ],
-    "Science Week": [
-      "Short recount, report or instructions from a Science Week experiment. (LIT 1-25a, LIT 1-26a)"
-    ],
-    "Block 5 — Weather (Describe/Explain)": [
-      "Fact file: Weather types and seasons. (LIT 1-25a, LIT 1-26a)",
-      "Report: Report on a weather event, e.g. a storm. (LIT 1-29a)"
-    ],
-    "Block 6 — Pets (Instruct/Persuade)": [
-      "Instructions: How to look after a pet. (LIT 1-26a)",
-      "Persuasive leaflet: Persuade your family to get a pet. (LIT 1-29a)"
-    ],
-    "Block 7 — Revision": [
-      "Consolidation: Choose your best piece from the year and polish it into a final draft. (LIT 1-22a, LIT 1-23a)"
-    ]
-  }
-};
-
 const TOPIC_TASKS_BGE_SEED = {
   "Expressive Arts": {
     "Block 1 — Autumn/Harvest": [
@@ -995,7 +955,7 @@ const BUNDLE2_SEED = {
 const BUNDLE2_CONTEXTS = "Suggested contexts: Water (flooding), Transport, Enterprise (textiles design), Development of Technology (Inventors); Other: Winter/Arctic theme, Mapping, Sustainability, Toys & Games.";
 
 /* BGE / Topics view: the combined lane split into its four original areas */
-const BGE_SPLIT_SUBJECTS = ["Literacy", "Expressive Arts", "Sciences", "Social Studies", "Technologies", "Meta Skills"];
+const BGE_SPLIT_SUBJECTS = ["Expressive Arts", "Sciences", "Social Studies", "Technologies", "Meta Skills"];
 const BGE_LEAD_SUBJECT_BY_CYCLE = { 1: "Sciences", 2: "Expressive Arts", 3: "Technologies", 4: "Social Studies" };
 const BUNDLE2_SPLIT_SEED = {
   "Expressive Arts": [
@@ -1472,15 +1432,15 @@ function render(){
 }
 
 const BGE_AUTO_FILL_PLAN = [
-  { weekStart: 1,  weekEnd: 6,  liKey: "Block 1 — Autumn/Harvest",              literacyKey: "Block 1 — Autumn/Harvest (Recount)",              topicKey: "Block 1 — Autumn/Harvest" },
-  { weekStart: 7,  weekEnd: 12, liKey: "Block 2 — Minibeasts",                  literacyKey: "Block 2 — Minibeasts (Inquire/Socialise)",         topicKey: "Block 2 — Minibeasts" },
-  { weekStart: 13, weekEnd: 17, liKey: "Block 3 — Fairytales / Superheroes",    literacyKey: "Block 3 — Fairytales / Superheroes (Narrative)",  topicKey: "Block 3 — Fairytales / Superheroes" },
-  { weekStart: 18, weekEnd: 18, liKey: "Superhero Design-Challenge Week",       literacyKey: "Superhero Design-Challenge Week",                  topicKey: "Superhero Design-Challenge Week" },
-  { weekStart: 19, weekEnd: 23, liKey: "Block 4 — Under the Sea",               literacyKey: "Block 4 — Under the Sea (Narrative Poetry)",       topicKey: "Block 4 — Under the Sea" },
-  { weekStart: 24, weekEnd: 24, liKey: "Science Week",                         literacyKey: "Science Week",                                     topicKey: "Science Week" },
-  { weekStart: 25, weekEnd: 30, liKey: "Block 5 — Weather",                    literacyKey: "Block 5 — Weather (Describe/Explain)",             topicKey: "Block 5 — Weather" },
-  { weekStart: 31, weekEnd: 36, liKey: "Block 6 — Pets",                       literacyKey: "Block 6 — Pets (Instruct/Persuade)",               topicKey: "Block 6 — Pets" },
-  { weekStart: 37, weekEnd: 40, liKey: "Block 7 — Revision",                   literacyKey: "Block 7 — Revision",                               topicKey: "Block 7 — Revision" }
+  { weekStart: 1,  weekEnd: 6,  liKey: "Block 1 — Autumn/Harvest",              topicKey: "Block 1 — Autumn/Harvest",              bigQuestion: "What happens to nature in autumn, and how do we celebrate the harvest?" },
+  { weekStart: 7,  weekEnd: 12, liKey: "Block 2 — Minibeasts",                  topicKey: "Block 2 — Minibeasts",                  bigQuestion: "What minibeasts live near us, and how do they help our world?" },
+  { weekStart: 13, weekEnd: 17, liKey: "Block 3 — Fairytales / Superheroes",    topicKey: "Block 3 — Fairytales / Superheroes",    bigQuestion: "What makes a hero — in fairytales and in real life?" },
+  { weekStart: 18, weekEnd: 18, liKey: "Superhero Design-Challenge Week",       topicKey: "Superhero Design-Challenge Week",       bigQuestion: "Could you invent a gadget worthy of a superhero?" },
+  { weekStart: 19, weekEnd: 23, liKey: "Block 4 — Under the Sea",               topicKey: "Block 4 — Under the Sea",               bigQuestion: "What wonders are hiding beneath the waves?" },
+  { weekStart: 24, weekEnd: 24, liKey: "Science Week",                         topicKey: "Science Week",                         bigQuestion: "How can we investigate the world like real scientists?" },
+  { weekStart: 25, weekEnd: 30, liKey: "Block 5 — Weather",                    topicKey: "Block 5 — Weather",                    bigQuestion: "Why does our weather keep changing?" },
+  { weekStart: 31, weekEnd: 36, liKey: "Block 6 — Pets",                       topicKey: "Block 6 — Pets",                       bigQuestion: "What makes a happy, healthy pet — and are you ready for one?" },
+  { weekStart: 37, weekEnd: 40, liKey: "Block 7 — Revision",                   topicKey: "Block 7 — Revision",                   bigQuestion: "What's the best piece of writing I've done this year — and how can I make it even better?" }
 ];
 
 function globalWeekToLocal(globalWeek){
@@ -1489,11 +1449,16 @@ function globalWeekToLocal(globalWeek){
   return { cycleNum, localWi };
 }
 
+function globalWeekDate(globalWeek){
+  const { cycleNum, localWi } = globalWeekToLocal(globalWeek);
+  const c = state.cycles[cycleNum];
+  return (c && c.weeks[localWi]) ? c.weeks[localWi].date : "";
+}
+
 function autoFillBgeFromPlan(){
   let filled = 0;
   const liSubject = liSubjectKey(BGE_SUBJECT);
   const liBank = BGE_LI_SEED[liSubject] || {};
-  const literacyBank = LITERACY_BGE_SEED["Literacy"] || {};
   const topicSubjects = ["Expressive Arts","Sciences","Social Studies","Technologies","Meta Skills"];
 
   BGE_AUTO_FILL_PLAN.forEach(block=>{
@@ -1505,10 +1470,6 @@ function autoFillBgeFromPlan(){
       if(liBank[block.liKey]){
         const key = cellKey(liSubject, localWi);
         if(!c.cells[key]){ c.cells[key] = liBank[block.liKey].join("\n"); filled++; }
-      }
-      if(literacyBank[block.literacyKey]){
-        const key = cellKey("Literacy", localWi);
-        if(!c.cells[key]){ c.cells[key] = literacyBank[block.literacyKey].join("\n"); filled++; }
       }
       topicSubjects.forEach(subject=>{
         const subjBank = TOPIC_TASKS_BGE_SEED[subject] || {};
@@ -1536,9 +1497,14 @@ function renderBgeView(){
       const tint = lightenHex(CYCLE_COLORS[cycleNum], 0.55);
       const label = block.liKey.replace(/^Block \d+ — /, '').replace(' / Superheroes', '/\nSuperheroes');
       const weekLabel = block.weekStart === block.weekEnd ? `Wk${block.weekStart}` : `Wk${block.weekStart}-${block.weekEnd}`;
+      const startDate = globalWeekDate(block.weekStart);
+      const endDate = globalWeekDate(block.weekEnd);
+      const dateLabel = block.weekStart === block.weekEnd ? startDate : [startDate, endDate].filter(Boolean).join(' – ');
       return `<th style="background:${tint};">
         ${escapeHtml(label)}
         <span style="display:block; font-size:10.5px; opacity:0.8; font-weight:400;">${weekLabel} · Cycle ${cycleNum}</span>
+        ${dateLabel ? `<span style="display:block; font-size:10px; opacity:0.75; font-weight:400;">${escapeHtml(dateLabel)}</span>` : ''}
+        ${block.bigQuestion ? `<span style="display:block; font-size:10.5px; opacity:0.9; font-weight:400; font-style:italic; margin-top:4px; white-space:normal;">${escapeHtml(block.bigQuestion)}</span>` : ''}
       </th>`;
     }).join('');
 
@@ -1566,8 +1532,8 @@ function renderBgeView(){
     const stripe = idx % 2 === 0 ? 'stripe-a' : 'stripe-b';
     const caCells = BGE_AUTO_FILL_PLAN.map(block=>{
       const { text, cycleNum, localWi } = blockCell(subject, block);
-      const cls = text ? "cell-inner compact filled" : "cell-inner compact empty";
-      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${localWi}" data-cycle="${cycleNum}">${text ? escapeHtml(truncate(text,70)) : "+ add"}</div></td>`;
+      const cls = text ? "cell-inner filled" : "cell-inner empty";
+      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${localWi}" data-cycle="${cycleNum}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
     }).join('');
     return `<tr class="ca-row">
       <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
@@ -1690,13 +1656,20 @@ function renderWeeklyView(){
     const rows = periods.map(period=>{
       return period.activities.map(act=>{
         let refText = "—";
+        let taskChipsText = "";
         if(act.subject){
           const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
           const hint = getWeekProgramHintForExport(act.subject, globalWeek);
           const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
-          const ca = act.subject !== BGE_SUBJECT ? (c.cells[cellKey(act.subject, wi)] || "") : "";
+          let ca = "";
+          if(act.subject === BGE_SUBJECT){
+            ca = BGE_SPLIT_SUBJECTS.map(s => c.cells[cellKey(s, wi)] || "").filter(Boolean).join("\n");
+          }else{
+            ca = c.cells[cellKey(act.subject, wi)] || "";
+          }
           const parts = [li, ca, hint].filter(Boolean);
           if(parts.length) refText = parts.join(" · ");
+          taskChipsText = [li, ca].filter(Boolean).join("\n");
         }
         const dKey = dailyDetailKey(day, act.label);
         const detailText = c.cells[cellKey(dKey, wi)] || "";
@@ -1705,7 +1678,7 @@ function renderWeeklyView(){
           <td class="wk-time">${escapeHtml(period.time)}</td>
           <td class="wk-activity">${escapeHtml(act.label)}</td>
           <td class="wk-ref">${escapeHtml(refText)}</td>
-          <td class="wk-detail"><div class="${cls}" data-subject="${escapeAttr(dKey)}" data-wi="${wi}">${detailText ? escapeHtml(detailText) : "+ add detail"}</div></td>
+          <td class="wk-detail"><div class="${cls}" data-subject="${escapeAttr(dKey)}" data-wi="${wi}" data-taskchips="${escapeAttr(taskChipsText)}">${detailText ? escapeHtml(detailText) : "+ add detail"}</div></td>
         </tr>`;
       }).join('');
     }).join('');
@@ -1716,7 +1689,7 @@ function renderWeeklyView(){
   }).join('');
 
   body.querySelectorAll('.cell-inner').forEach(el=>{
-    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
+    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi), el.dataset.taskchips));
   });
 }
 
@@ -1724,7 +1697,7 @@ function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+"…" : s; }
 function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escapeAttr(s){ return escapeHtml(s); }
 
-function openCellEditor(subject, wi){
+function openCellEditor(subject, wi, taskChipsText){
   activeCell = {subject, wi};
   document.getElementById('cellModalTitle').textContent = `${subject} · Week ${wi+1}`;
   document.getElementById('cellModalDate').textContent = cur().weeks[wi].date;
@@ -1752,7 +1725,24 @@ function openCellEditor(subject, wi){
   }
 
   const linkBox = document.getElementById('linkedTopicsBox');
-  if(subject === LISTENING_SUBJECT){
+  if(taskChipsText){
+    const lines = taskChipsText.split("\n").map(l=>l.trim()).filter(Boolean);
+    let html = '<div class="bank-title">This week\'s tasks — click to add</div>';
+    if(lines.length){
+      html += lines.map(line=>`<span class="chip link-chip" data-insert="${escapeAttr(line)}">${escapeHtml(truncate(line,80))}</span>`).join(' ');
+    }else{
+      html += `<div class="linked-empty">Nothing planned for this yet — check the Ten-Week Planner or BGE section.</div>`;
+    }
+    linkBox.style.display = "block";
+    linkBox.innerHTML = html;
+    linkBox.querySelectorAll('.link-chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        const ta = document.getElementById('cellText');
+        const val = chip.dataset.insert;
+        ta.value = ta.value ? ta.value + "\n" + val : val;
+      });
+    });
+  }else if(subject === LISTENING_SUBJECT){
     const bgeText = cur().cells[cellKey(BGE_SUBJECT, wi)] || "";
     const writingText = cur().cells[cellKey(WRITING_SUBJECT, wi)] || "";
     let html = '<div class="bank-title">Linked to this week</div>';
