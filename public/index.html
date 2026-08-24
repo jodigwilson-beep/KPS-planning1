@@ -1502,9 +1502,11 @@ function renderWeeklyView(){
       return period.activities.map(act=>{
         let refText = "—";
         if(act.subject){
+          const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+          const hint = getWeekProgramHintForExport(act.subject, globalWeek);
           const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
           const ca = act.subject !== BGE_SUBJECT ? (c.cells[cellKey(act.subject, wi)] || "") : "";
-          const parts = [li, ca].filter(Boolean);
+          const parts = [li, ca, hint].filter(Boolean);
           if(parts.length) refText = parts.join(" · ");
         }
         const dKey = dailyDetailKey(day, act.label);
