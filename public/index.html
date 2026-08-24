@@ -325,11 +325,13 @@
     <!-- BGE / TOPICS -->
     <section id="view-bge" class="hub-view">
       <header>
-        <h1 id="bgeCycleTitle" style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">Planning Cycle</h1>
-        <p style="margin:0; opacity:0.85;">Expressive Arts / Sciences / Social Studies / Technologies — the topic driving each cycle.</p>
+        <h1 style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">BGE / Topics — Whole Year</h1>
+        <p style="margin:0; opacity:0.85;">Each column is a 6-week topic/writing block spanning the whole year, colour-tinted by which cycle it falls in.</p>
       </header>
 
-      <div class="cycle-tabs" id="bgeCycleTabs"></div>
+      <div style="margin-bottom:14px;">
+        <button class="btn-ghost" id="bgeAutoFillBtn">Fill in BGE from topic plan</button>
+      </div>
 
       <div class="grid-scroll">
         <table id="bgeGrid">
@@ -1304,7 +1306,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, TOPIC_TASKS_BGE_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -1469,30 +1471,91 @@ function render(){
   renderWeeklyView();
 }
 
-function renderBgeView(){
-  const c = cur();
-  renderTabs('bgeCycleTabs');
-  const bgeHeaderEl = document.querySelector('#view-bge header');
-  bgeHeaderEl.className = 'c' + state.activeCycle;
-  document.getElementById('bgeGrid').className = 'c' + state.activeCycle;
-  document.getElementById('bgeCycleTitle').textContent = c.cycleTitle;
+const BGE_AUTO_FILL_PLAN = [
+  { weekStart: 1,  weekEnd: 6,  liKey: "Block 1 — Autumn/Harvest",              literacyKey: "Block 1 — Autumn/Harvest (Recount)",              topicKey: "Block 1 — Autumn/Harvest" },
+  { weekStart: 7,  weekEnd: 12, liKey: "Block 2 — Minibeasts",                  literacyKey: "Block 2 — Minibeasts (Inquire/Socialise)",         topicKey: "Block 2 — Minibeasts" },
+  { weekStart: 13, weekEnd: 17, liKey: "Block 3 — Fairytales / Superheroes",    literacyKey: "Block 3 — Fairytales / Superheroes (Narrative)",  topicKey: "Block 3 — Fairytales / Superheroes" },
+  { weekStart: 18, weekEnd: 18, liKey: "Superhero Design-Challenge Week",       literacyKey: "Superhero Design-Challenge Week",                  topicKey: "Superhero Design-Challenge Week" },
+  { weekStart: 19, weekEnd: 23, liKey: "Block 4 — Under the Sea",               literacyKey: "Block 4 — Under the Sea (Narrative Poetry)",       topicKey: "Block 4 — Under the Sea" },
+  { weekStart: 24, weekEnd: 24, liKey: "Science Week",                         literacyKey: "Science Week",                                     topicKey: "Science Week" },
+  { weekStart: 25, weekEnd: 30, liKey: "Block 5 — Weather",                    literacyKey: "Block 5 — Weather (Describe/Explain)",             topicKey: "Block 5 — Weather" },
+  { weekStart: 31, weekEnd: 36, liKey: "Block 6 — Pets",                       literacyKey: "Block 6 — Pets (Instruct/Persuade)",               topicKey: "Block 6 — Pets" },
+  { weekStart: 37, weekEnd: 40, liKey: "Block 7 — Revision",                   literacyKey: "Block 7 — Revision",                               topicKey: "Block 7 — Revision" }
+];
 
+function globalWeekToLocal(globalWeek){
+  const cycleNum = Math.floor((globalWeek - 1) / 10) + 1;
+  const localWi = (globalWeek - 1) % 10;
+  return { cycleNum, localWi };
+}
+
+function autoFillBgeFromPlan(){
+  let filled = 0;
+  const liSubject = liSubjectKey(BGE_SUBJECT);
+  const liBank = BGE_LI_SEED[liSubject] || {};
+  const literacyBank = LITERACY_BGE_SEED["Literacy"] || {};
+  const topicSubjects = ["Expressive Arts","Sciences","Social Studies","Technologies","Meta Skills"];
+
+  BGE_AUTO_FILL_PLAN.forEach(block=>{
+    for(let gw = block.weekStart; gw <= block.weekEnd; gw++){
+      const { cycleNum, localWi } = globalWeekToLocal(gw);
+      const c = state.cycles[cycleNum];
+      if(!c) continue;
+
+      if(liBank[block.liKey]){
+        const key = cellKey(liSubject, localWi);
+        if(!c.cells[key]){ c.cells[key] = liBank[block.liKey].join("\n"); filled++; }
+      }
+      if(literacyBank[block.literacyKey]){
+        const key = cellKey("Literacy", localWi);
+        if(!c.cells[key]){ c.cells[key] = literacyBank[block.literacyKey].join("\n"); filled++; }
+      }
+      topicSubjects.forEach(subject=>{
+        const subjBank = TOPIC_TASKS_BGE_SEED[subject] || {};
+        if(subjBank[block.topicKey]){
+          const key = cellKey(subject, localWi);
+          if(!c.cells[key]){ c.cells[key] = subjBank[block.topicKey].join("\n"); filled++; }
+        }
+      });
+    }
+  });
+
+  if(filled > 0) persist();
+  render();
+  alert(filled > 0
+    ? `Filled in ${filled} cell(s) across the BGE section directly from your topic plan.`
+    : "Those weeks already have content — nothing was changed.");
+}
+document.getElementById('bgeAutoFillBtn').addEventListener('click', autoFillBgeFromPlan);
+
+function renderBgeView(){
   const headRow = document.getElementById('bgeHeadRow');
   headRow.innerHTML = '<th class="subject-head">Curricular Area</th>' +
-    c.weeks.map((w,i)=>`
-      <th data-wi="${i}">
-        Week ${i+1}
-        <span style="display:block; font-size:11px; opacity:0.85; font-weight:400;">${escapeHtml(w.date)}</span>
-        ${w.note ? `<span class="wk-note">${escapeHtml(w.note)}</span>` : ''}
-      </th>
-    `).join('');
+    BGE_AUTO_FILL_PLAN.map(block=>{
+      const { cycleNum } = globalWeekToLocal(block.weekStart);
+      const tint = lightenHex(CYCLE_COLORS[cycleNum], 0.55);
+      const label = block.liKey.replace(/^Block \d+ — /, '').replace(' / Superheroes', '/\nSuperheroes');
+      const weekLabel = block.weekStart === block.weekEnd ? `Wk${block.weekStart}` : `Wk${block.weekStart}-${block.weekEnd}`;
+      return `<th style="background:${tint};">
+        ${escapeHtml(label)}
+        <span style="display:block; font-size:10.5px; opacity:0.8; font-weight:400;">${weekLabel} · Cycle ${cycleNum}</span>
+      </th>`;
+    }).join('');
 
   const body = document.getElementById('bgeBodyRows');
   const bgeLiSubject = liSubjectKey(BGE_SUBJECT);
-  const liCells = c.weeks.map((w,wi)=>{
-    const text = c.cells[cellKey(bgeLiSubject,wi)] || "";
+
+  function blockCell(subject, block){
+    const { cycleNum, localWi } = globalWeekToLocal(block.weekStart);
+    const c = state.cycles[cycleNum];
+    const text = c.cells[cellKey(subject, localWi)] || "";
+    return { text, cycleNum, localWi };
+  }
+
+  const liCells = BGE_AUTO_FILL_PLAN.map(block=>{
+    const { text, cycleNum, localWi } = blockCell(bgeLiSubject, block);
     const cls = text ? "cell-inner filled" : "cell-inner empty";
-    return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(bgeLiSubject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
+    return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(bgeLiSubject)}" data-wi="${localWi}" data-cycle="${cycleNum}">${text ? escapeHtml(text) : "+ add"}</div></td>`;
   }).join('');
   const liRow = `<tr class="li-row-standalone">
     <td class="subject-cell">Learning Intention<span style="display:block; font-size:10.5px; font-weight:400; opacity:0.8; margin-top:2px;">Cross-curricular links across all four areas</span><span class="bank-link" data-subject="${escapeAttr(bgeLiSubject)}">Manage bank →</span></td>
@@ -1501,10 +1564,10 @@ function renderBgeView(){
 
   const caRows = BGE_SPLIT_SUBJECTS.map((subject, idx)=>{
     const stripe = idx % 2 === 0 ? 'stripe-a' : 'stripe-b';
-    const caCells = c.weeks.map((w,wi)=>{
-      const text = c.cells[cellKey(subject,wi)] || "";
+    const caCells = BGE_AUTO_FILL_PLAN.map(block=>{
+      const { text, cycleNum, localWi } = blockCell(subject, block);
       const cls = text ? "cell-inner compact filled" : "cell-inner compact empty";
-      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(truncate(text,70)) : "+ add"}</div></td>`;
+      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${localWi}" data-cycle="${cycleNum}">${text ? escapeHtml(truncate(text,70)) : "+ add"}</div></td>`;
     }).join('');
     return `<tr class="ca-row">
       <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
@@ -1515,7 +1578,10 @@ function renderBgeView(){
   body.innerHTML = liRow + caRows;
 
   body.querySelectorAll('.cell-inner').forEach(el=>{
-    el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi)));
+    el.addEventListener('click', ()=>{
+      state.activeCycle = parseInt(el.dataset.cycle);
+      openCellEditor(el.dataset.subject, parseInt(el.dataset.wi));
+    });
   });
   body.querySelectorAll('.bank-link').forEach(el=>{
     el.addEventListener('click', ()=>openBankManager(el.dataset.subject));
@@ -2326,7 +2392,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, LITERACY_BGE_SEED, TOPIC_TASKS_BGE_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
