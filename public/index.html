@@ -660,6 +660,38 @@ const META_SKILLS_SEED = {
   }
 };
 
+const WRITING_LI_SEED = {
+  [liSubjectKey("Literacy – Writing")]: {
+    "Block 1 — Diary": [
+      "I can write about a real event or experience.",
+      "I can write in the first person using I, my and we.",
+      "I can include when and where the event happened.",
+      "I can describe how I felt."
+    ],
+    "Block 1 — Biography": [
+      "I can write about a real person.",
+      "I can include the person's name.",
+      "I can write simple facts about the person.",
+      "I can use words such as he, she or they.",
+      "I can draw a picture or add a title to match my writing."
+    ],
+    "Block 1 — Recount (Personal Experience)": [
+      "I can write about something that really happened to me.",
+      "I can use I and my to tell about myself.",
+      "I can say where and when the event happened.",
+      "I can explain what happened.",
+      "I can write about how I felt."
+    ],
+    "Block 1 — Retell": [
+      "I can retell a familiar story, event or information.",
+      "I can say who or what the retell is about.",
+      "I can explain what happened in the correct order.",
+      "I can use simple time words such as first, then and next.",
+      "I can retell what someone said using their exact words with support."
+    ]
+  }
+};
+
 const ETHOS_SEED = {
   "Ethos and Life of the School": {
     "Self-Management": [
@@ -832,46 +864,46 @@ const GRAMMAR_P2_SEED = {
 
 /* Week-numbered programmes (weeks 1-40 = Cycles 1-4 x 10 weeks). Shown as a hint next to each planner week. */
 const PHONICS_PLAN = {
-  1:{sounds:"ng",blends:"br th (ng at end)",common:"bring, thing",tricky:"many"},
-  2:{sounds:"oy",blends:"(oy at end)",common:"again, some, very",tricky:""},
-  3:{sounds:"oa",blends:"(oa at start/middle)",common:"who, two, don't",tricky:""},
-  4:{sounds:"Consolidation (incl. P1 sounds)",blends:"",common:"",tricky:""},
-  5:{sounds:"ss zz",blends:"bl fl gl cr",common:"miss",tricky:"because, long"},
-  6:{sounds:"ll",blends:"sw sp sk sm sh th ch shr (-all)",common:"all, call",tricky:""},
-  7:{sounds:"ff ph sc",blends:"gr",common:"green, off",tricky:"when, which"},
-  8:{sounds:"Consolidation",blends:"",common:"",tricky:""},
-  9:{sounds:"ar",blends:"ur st sc sp sl sm ch bl",common:"after",tricky:"Mrs, Mr"},
-  10:{sounds:"er or",blends:"st sh ch",common:"number, never",tricky:"another, mother"},
-  11:{sounds:"ir (bossy r)",blends:"st sh th",common:"girl, three, first",tricky:"school, other"},
-  12:{sounds:"Consolidation (esp. ir)",blends:"",common:"",tricky:""},
-  13:{sounds:"ay",blends:"pl cl tr st",common:"away, today, play",tricky:"always"},
-  14:{sounds:"ea (leaf)",blends:"dr cr st",common:"year, each, eat, dream",tricky:""},
-  15:{sounds:"ow (snow)",blends:"sn bl sl cr gl fl",common:"grow",tricky:"yellow"},
-  16:{sounds:"Consolidation — consonant blends",blends:"",common:"",tricky:""},
-  17:{sounds:"ue",blends:"bl gl tr",common:"blue, tree",tricky:"what, where"},
-  18:{sounds:"aw",blends:"th cl fl pr dr cr",common:"saw, claw, draw, crawl",tricky:""},
-  19:{sounds:"oi",blends:"sp st",common:"every, were",tricky:""},
-  20:{sounds:"Consolidation — consonant blends",blends:"",common:"",tricky:""},
-  21:{sounds:"au",blends:"cl st",common:"people, Autumn, August",tricky:""},
-  22:{sounds:"ew",blends:"br gr cr",common:"new, grew, crew, drew",tricky:""},
-  23:{sounds:"(blends only)",blends:"scr spl spr str",common:"four, too",tricky:""},
-  24:{sounds:"Consolidation",blends:"",common:"",tricky:""},
-  25:{sounds:"ow (owl)",blends:"pr tr cr fr dr cl fl",common:"how, now, down",tricky:""},
-  26:{sounds:"y (as I) — imposter 'y'",blends:"",common:"fly, try",tricky:"why"},
-  27:{sounds:"ou (found)",blends:"-ch -nd",common:"hand, out",tricky:"find, our"},
-  28:{sounds:"Consolidation",blends:"",common:"",tricky:""},
-  29:{sounds:"igh",blends:"th fl sl bl fr",common:"right, them",tricky:"there, only"},
-  30:{sounds:"a-e e-e (magic e)",blends:"",common:"these, make, made, came, here",tricky:""},
-  31:{sounds:"o-e i-e u-e (magic e)",blends:"",common:"home, more, five, time, life, like",tricky:""},
-  32:{sounds:"Consolidation",blends:"",common:"",tricky:""},
-  33:{sounds:"kn mb (silent letters)",blends:"",common:"their, know",tricky:""},
+  1:{sounds:"Consolidation including P1 sounds",blends:"",common:"",tricky:""},
+  2:{sounds:"oi",blends:"",common:"bring, thing",tricky:"again, some, very"},
+  3:{sounds:"oa",blends:"",common:"three",tricky:"who, two, don't"},
+  4:{sounds:"Consolidation of oi, oa — blending and sentence dictation",blends:"",common:"",tricky:""},
+  5:{sounds:"ar ur",blends:"st sc sp sl sm ch bl",common:"another, Mrs, Mr, school",tricky:""},
+  6:{sounds:"er ir",blends:"st (sp) sh ch th",common:"girl, number, never, first, after",tricky:""},
+  7:{sounds:"Consolidation of ar ur er ir — blending and sentence dictation",blends:"",common:"",tricky:""},
+  8:{sounds:"ay",blends:"pl cl tr st",common:"away, today, play",tricky:"always"},
+  9:{sounds:"ea (leaf)",blends:"dr cr st",common:"year, each, eat, dream",tricky:""},
+  10:{sounds:"ie",blends:"fl dr cr fr",common:"pie, cries, fries, dries",tricky:""},
+  11:{sounds:"Consolidation of ay ea ie — blending and sentence dictation",blends:"",common:"",tricky:""},
+  12:{sounds:"ue",blends:"bl gl tr",common:"blue, tree",tricky:"what, where"},
+  13:{sounds:"a-e e-e (magic e)",blends:"",common:"these, make, made, came, here",tricky:""},
+  14:{sounds:"o-e i-e u-e (magic e)",blends:"",common:"home, more, five, time, life, like",tricky:""},
+  15:{sounds:"Consolidation of short and long vowel sounds",blends:"",common:"",tricky:""},
+  16:{sounds:"Consolidation of short and long vowel sounds",blends:"",common:"",tricky:""},
+  17:{sounds:"ss zz",blends:"bl fl gl cr",common:"miss",tricky:"because, long"},
+  18:{sounds:"ll",blends:"sw sp sk sm sh th ch shr (-all)",common:"call, all",tricky:""},
+  19:{sounds:"ff ph sc",blends:"gr",common:"green, off",tricky:"when, which"},
+  20:{sounds:"Consolidation of double letters and initial consonant blends",blends:"",common:"",tricky:""},
+  21:{sounds:"ow (snow)",blends:"sn bl sl cr gl fl",common:"grow",tricky:"yellow"},
+  22:{sounds:"aw",blends:"th cl fl pr dr cr",common:"saw, claw, draw, crawl",tricky:""},
+  23:{sounds:"oy",blends:"sp -st",common:"every, were",tricky:""},
+  24:{sounds:"Consolidation of ow aw oy — blending and sentence dictation",blends:"",common:"",tricky:""},
+  25:{sounds:"au",blends:"cl st",common:"people, Autumn, August",tricky:""},
+  26:{sounds:"ew",blends:"br gr cr",common:"new, grew, crew, drew",tricky:""},
+  27:{sounds:"ow (owl)",blends:"pr tr cr fr dr cl fl",common:"how, now, down",tricky:""},
+  28:{sounds:"Consolidation of au ew ow — blending and sentence dictation",blends:"",common:"",tricky:""},
+  29:{sounds:"y (as I) — imposter 'y'",blends:"",common:"fly, try",tricky:"why"},
+  30:{sounds:"ou (found)",blends:"-ch -nd",common:"hand, out",tricky:"find, our"},
+  31:{sounds:"igh",blends:"th fl sl bl fr",common:"right, them",tricky:"there, only"},
+  32:{sounds:"Consolidation of y ou igh — blending and sentence dictation",blends:"",common:"",tricky:""},
+  33:{sounds:"kn mb (silent letters)",blends:"",common:"",tricky:"their, know"},
   34:{sounds:"-nk -mp",blends:"",common:"jump, think",tricky:""},
-  35:{sounds:"-lt -ft -pt -st -nt",blends:"",common:"want, said",tricky:""},
-  36:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
-  37:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
-  38:{sounds:"Consolidation of P2 sounds",blends:"",common:"",tricky:""},
-  39:{sounds:"Consolidation & assess for transition",blends:"",common:"",tricky:""},
-  40:{sounds:"Consolidation & assess for transition",blends:"",common:"",tricky:""}
+  35:{sounds:"-lt -ft -pt -st -nt",blends:"",common:"belt, lift, kept, nest, blunt",tricky:"want, said"},
+  36:{sounds:"scr spl spr str",blends:"",common:"screw, splash, spring, string",tricky:"four, too"},
+  37:{sounds:"Consolidation of P2 sounds and assess for transition",blends:"",common:"",tricky:""},
+  38:{sounds:"Consolidation of P2 sounds and assess for transition",blends:"",common:"",tricky:""},
+  39:{sounds:"Consolidation of P2 sounds and assess for transition",blends:"",common:"",tricky:""},
+  40:{sounds:"Consolidation of P2 sounds and assess for transition",blends:"",common:"",tricky:""}
 };
 const HANDWRITING_PLAN = {
   1:"Fine motor and writing opportunities", 2:"Fine motor and writing opportunities",
@@ -897,6 +929,25 @@ function phonicsHint(week){
 function handwritingHint(week){
   const h = HANDWRITING_PLAN[week];
   return h ? `Wk${week}: ${h}` : "";
+}
+
+const WRITING_BLOCKS = [
+  [1,6,"RECOUNT","Biography, Retell (direct or indirect), Recount – personal experience, Diary"],
+  [7,12,"INQUIRE/SOCIALISE","Message, Announcement, Personal correspondence – letter, Survey, Interview"],
+  [13,18,"NARRATIVE-PROSE","Narrative"],
+  [19,24,"NARRATIVE-POETRY","Riddles, Joke, Haiku, Lantern, Acrostic, Cinquain, Onomatopoeia/alliteration poems"],
+  [25,30,"DESCRIBE/EXPLAIN","Report, Contents page, Index, Glossary, Description, Menu, Blurb, Label, Biography, Journal"],
+  [31,36,"INSTRUCT/PERSUADE","Headlines, Competition entry, Instructions, Persuasive letter, Directions, Timetable, Experiment, Blueprint"],
+  [37,40,"REVISION & CONSOLIDATION",""]
+];
+const WRITING_PLAN = {};
+WRITING_BLOCKS.forEach(([start,end,focus,genres])=>{
+  for(let w=start; w<=end; w++) WRITING_PLAN[w] = {focus, genres};
+});
+function writingHint(week){
+  const p = WRITING_PLAN[week];
+  if(!p) return "";
+  return p.genres ? `Wk${week} (${p.focus}): ${p.genres}` : `Wk${week}: ${p.focus}`;
 }
 
 /* P.E yearly overview (P2), weeks 1-40 across Terms 1-4 */
@@ -1037,7 +1088,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -1167,7 +1218,11 @@ function render(){
     const caCells = c.weeks.map((w,wi)=>{
       const text = c.cells[cellKey(subject,wi)] || "";
       const cls = text ? "cell-inner compact filled" : "cell-inner compact empty";
-      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(truncate(text,70)) : "+ add"}</div></td>`;
+      const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+      let hint = "";
+      if(subject === "Literacy – Writing") hint = writingHint(globalWeek);
+      const hintHtml = hint ? `<span class="week-hint">${escapeHtml(hint)}</span>` : "";
+      return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(truncate(text,70)) : "+ add"}${hintHtml}</div></td>`;
     }).join('');
     const caRow = `<tr class="ca-row">
       <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
@@ -1262,6 +1317,7 @@ function openCellEditor(subject, wi){
   if(subject === "Literacy – Spelling/Phonics") progHint = phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") progHint = handwritingHint(globalWeek);
   if(subject === "P.E") progHint = peHint(globalWeek);
+  if(subject === "Literacy – Writing") progHint = writingHint(globalWeek);
   const progBox = document.getElementById('weekProgramBox');
   if(progHint){
     progBox.style.display = "block";
@@ -1552,6 +1608,7 @@ function getWeekProgramHintForExport(subject, globalWeek){
   if(subject === "Literacy – Spelling/Phonics") return phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") return handwritingHint(globalWeek);
   if(subject === "P.E") return peHint(globalWeek);
+  if(subject === "Literacy – Writing") return writingHint(globalWeek);
   return "";
 }
 
@@ -1914,7 +1971,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
