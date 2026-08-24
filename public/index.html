@@ -180,9 +180,18 @@
 
   .weekly-day-card{background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius); margin-bottom:16px; overflow:hidden;}
   .weekly-day-card h3{
-    background:var(--board); color:var(--chalk); font-family:'Quicksand',sans-serif; font-size:15px;
-    margin:0; padding:8px 14px;
+    color:#fff; font-family:'Quicksand',sans-serif; font-size:15px;
+    margin:0; padding:8px 14px; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+    user-select:none;
   }
+  .weekly-day-card h3 .wk-toggle{font-size:12px; opacity:0.85;}
+  .weekly-day-card.day-Mon h3{background:#2E86AB;}
+  .weekly-day-card.day-Tues h3{background:#A23B72;}
+  .weekly-day-card.day-Wed h3{background:#F18F01;}
+  .weekly-day-card.day-Thurs h3{background:#3B8C6E;}
+  .weekly-day-card.day-Fri h3{background:#C73E1D;}
+  .weekly-day-card table.weekly-day-table{display:none;}
+  .weekly-day-card.expanded table.weekly-day-table{display:table;}
   table.weekly-day-table{width:100%; border-collapse:collapse;}
   table.weekly-day-table td{border-bottom:1px solid var(--paper-line); padding:8px 12px; vertical-align:top; font-size:12.5px;}
   table.weekly-day-table tr:last-child td{border-bottom:none;}
@@ -354,6 +363,7 @@
       <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
         <label for="weeklyWeekSelect" style="font-weight:700; font-size:13px;">Week:</label>
         <select id="weeklyWeekSelect" style="padding:7px 10px; border-radius:7px; border:1px solid var(--paper-line); font-family:inherit; font-size:13px;"></select>
+        <button class="btn-ghost" id="weeklyWordBtn">Download as Word</button>
       </div>
 
       <div id="weeklyBody"></div>
@@ -1556,6 +1566,7 @@ function renderBgeView(){
 }
 
 /* ============ WEEKLY PLAN (day-by-day timetable) ============ */
+let weeklyExpandedDays = new Set();
 const WEEKLY_TIMETABLE = {
   "Mon": [
     { time: "9-10.30", activities: [
@@ -1683,11 +1694,21 @@ function renderWeeklyView(){
         </tr>`;
       }).join('');
     }).join('');
-    return `<div class="weekly-day-card">
-      <h3>${day}</h3>
+    return `<div class="weekly-day-card day-${day}${weeklyExpandedDays.has(day) ? ' expanded' : ''}" data-day="${day}">
+      <h3><span>${day}</span><span class="wk-toggle">${weeklyExpandedDays.has(day) ? '▲ Collapse' : '▼ Click to expand'}</span></h3>
       <table class="weekly-day-table"><tbody>${rows}</tbody></table>
     </div>`;
   }).join('');
+
+  body.querySelectorAll('.weekly-day-card > h3').forEach(h=>{
+    h.addEventListener('click', ()=>{
+      const card = h.closest('.weekly-day-card');
+      const day = card.dataset.day;
+      if(weeklyExpandedDays.has(day)) weeklyExpandedDays.delete(day);
+      else weeklyExpandedDays.add(day);
+      renderWeeklyView();
+    });
+  });
 
   body.querySelectorAll('.cell-inner').forEach(el=>{
     el.addEventListener('click', ()=>openCellEditor(el.dataset.subject, parseInt(el.dataset.wi), el.dataset.taskchips));
@@ -2174,6 +2195,130 @@ async function downloadWordDoc(){
 document.getElementById('wordBtn').addEventListener('click', downloadWordDoc);
 
 document.getElementById('weeklyWeekSelect').addEventListener('change', renderWeeklyView);
+
+async function downloadWeeklyPlanDoc(){
+  if(!window.docx){
+    alert("Word export library hasn't loaded yet — check your connection and try again in a moment.");
+    return;
+  }
+  const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType, ShadingType, AlignmentType, VerticalAlign, PageOrientation } = window.docx;
+
+  const c = cur();
+  const wi = parseInt(document.getElementById('weeklyWeekSelect').value || 0);
+  const FONT = "Arial";
+  const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
+  const TOTAL_WIDTH = 15300;
+  const COL_TIME = 1400;
+  const COL_ACTIVITY = 2400;
+  const COL_REF = 5000;
+  const COL_DETAIL = TOTAL_WIDTH - COL_TIME - COL_ACTIVITY - COL_REF;
+
+  const DAY_COLORS = { "Mon":"2E86AB", "Tues":"A23B72", "Wed":"F18F01", "Thurs":"3B8C6E", "Fri":"C73E1D" };
+  function lighten(hex, amount){
+    const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+    const nr = Math.round(r + (255-r)*amount), ng = Math.round(g + (255-g)*amount), nb = Math.round(b + (255-b)*amount);
+    return [nr,ng,nb].map(v=>v.toString(16).padStart(2,'0').toUpperCase()).join('');
+  }
+
+  function cell(text, opts={}){
+    return new TableCell({
+      width: { size: opts.width, type: WidthType.DXA },
+      shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
+      verticalAlign: VerticalAlign.TOP,
+      margins: CELL_MARGINS,
+      children: [new Paragraph({
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, italics: !!opts.italics, size: opts.size || 18, color: opts.color || "000000", font: FONT })]
+      })]
+    });
+  }
+
+  const days = ["Mon","Tues","Wed","Thurs","Fri"];
+  const children = [
+    new Paragraph({
+      children: [new TextRun({ text: `Weekly Plan — ${c.cycleTitle} — Week ${wi+1} (${c.weeks[wi].date})`, bold: true, size: 30, font: FONT, color: "0F7A73" })],
+      spacing: { after: 200 }
+    })
+  ];
+
+  days.forEach(day=>{
+    const dayColor = DAY_COLORS[day];
+    const tint = lighten(dayColor, 0.75);
+    children.push(new Paragraph({
+      children: [new TextRun({ text: day, bold: true, size: 24, font: FONT, color: "FFFFFF" })],
+      shading: { type: ShadingType.CLEAR, fill: dayColor },
+      spacing: { before: 200, after: 100 }
+    }));
+
+    const rows = [new TableRow({
+      tableHeader: true,
+      children: [
+        cell("Time", { width: COL_TIME, fill: dayColor, bold: true, color: "FFFFFF" }),
+        cell("Activity", { width: COL_ACTIVITY, fill: dayColor, bold: true, color: "FFFFFF" }),
+        cell("This week's focus", { width: COL_REF, fill: dayColor, bold: true, color: "FFFFFF" }),
+        cell("Daily detail", { width: COL_DETAIL, fill: dayColor, bold: true, color: "FFFFFF" })
+      ]
+    })];
+
+    WEEKLY_TIMETABLE[day].forEach(period=>{
+      period.activities.forEach(act=>{
+        let refText = "—";
+        if(act.subject){
+          const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
+          const hint = getWeekProgramHintForExport(act.subject, globalWeek);
+          const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
+          let ca = "";
+          if(act.subject === BGE_SUBJECT){
+            ca = BGE_SPLIT_SUBJECTS.map(s => c.cells[cellKey(s, wi)] || "").filter(Boolean).join(" · ");
+          }else{
+            ca = c.cells[cellKey(act.subject, wi)] || "";
+          }
+          const parts = [li, ca, hint].filter(Boolean);
+          if(parts.length) refText = parts.join(" · ");
+        }
+        const dKey = dailyDetailKey(day, act.label);
+        const detailText = c.cells[cellKey(dKey, wi)] || "";
+        rows.push(new TableRow({
+          children: [
+            cell(period.time, { width: COL_TIME, fill: tint, bold: true }),
+            cell(act.label, { width: COL_ACTIVITY, fill: tint, bold: true }),
+            cell(refText === "—" ? "" : refText, { width: COL_REF, fill: tint, italics: true }),
+            cell(detailText, { width: COL_DETAIL, fill: tint })
+          ]
+        }));
+      });
+    });
+
+    children.push(new Table({
+      width: { size: TOTAL_WIDTH, type: WidthType.DXA },
+      columnWidths: [COL_TIME, COL_ACTIVITY, COL_REF, COL_DETAIL],
+      rows
+    }));
+  });
+
+  try{
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            size: { width: 16838, height: 11906 },
+            margin: { top: 720, bottom: 720, left: 720, right: 720 }
+          }
+        },
+        children
+      }]
+    });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `weekly-plan-cycle${state.activeCycle}-week${wi+1}.docx`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 30000);
+  }catch(e){
+    alert("Couldn't generate the Word document: " + (e.message || "unknown error"));
+  }
+}
+document.getElementById('weeklyWordBtn').addEventListener('click', downloadWeeklyPlanDoc);
 
 /* Subject-coverage export: all 4 cycles for one subject, color-coded by cycle */
 const coverageSelect = document.getElementById('coverageSubjectSelect');
