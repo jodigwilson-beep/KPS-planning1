@@ -662,19 +662,6 @@ const META_SKILLS_SEED = {
 
 const WRITING_LI_SEED = {
   [liSubjectKey("Literacy – Writing")]: {
-    "Block 1 — Diary": [
-      "I can write about a real event or experience.",
-      "I can write in the first person using I, my and we.",
-      "I can include when and where the event happened.",
-      "I can describe how I felt."
-    ],
-    "Block 1 — Biography": [
-      "I can write about a real person.",
-      "I can include the person's name.",
-      "I can write simple facts about the person.",
-      "I can use words such as he, she or they.",
-      "I can draw a picture or add a title to match my writing."
-    ],
     "Block 1 — Recount (Personal Experience)": [
       "I can write about something that really happened to me.",
       "I can use I and my to tell about myself.",
@@ -688,6 +675,15 @@ const WRITING_LI_SEED = {
       "I can explain what happened in the correct order.",
       "I can use simple time words such as first, then and next.",
       "I can retell what someone said using their exact words with support."
+    ]
+  }
+};
+
+const BGE_LI_SEED = {
+  [liSubjectKey(BGE_SUBJECT)]: {
+    "Cycle 1 — Toy Detectives": [
+      "Recount: The day I discovered how my toy moves.",
+      "Retell: Retell how we tested magnets in class."
     ]
   }
 };
@@ -1088,7 +1084,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -1971,7 +1967,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BGE_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
