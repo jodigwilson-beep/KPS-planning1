@@ -341,6 +341,7 @@
 
       <div style="margin-bottom:14px;">
         <button class="btn-ghost" id="bgeAutoFillBtn">Fill in BGE from topic plan</button>
+        <button class="btn-ghost" id="bgeWordBtn">Download as Word</button>
       </div>
 
       <div class="grid-scroll">
@@ -1501,6 +1502,115 @@ function autoFillBgeFromPlan(){
     : "Those weeks already have content — nothing was changed.");
 }
 document.getElementById('bgeAutoFillBtn').addEventListener('click', autoFillBgeFromPlan);
+
+async function downloadBgeDoc(){
+  if(!window.docx){
+    alert("Word export library hasn't loaded yet — check your connection and try again in a moment.");
+    return;
+  }
+  const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType, ShadingType, VerticalAlign } = window.docx;
+
+  const FONT = "Arial";
+  const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
+  const TOTAL_WIDTH = 15300;
+  const LABEL_COL = 2200;
+  const BLOCKS_PER_TABLE = 3;
+  const blockColWidth = Math.floor((TOTAL_WIDTH - LABEL_COL) / BLOCKS_PER_TABLE);
+
+  function cell(text, opts={}){
+    return new TableCell({
+      width: { size: opts.width, type: WidthType.DXA },
+      shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
+      verticalAlign: VerticalAlign.TOP,
+      margins: CELL_MARGINS,
+      children: [new Paragraph({
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, italics: !!opts.italics, size: opts.size || 17, color: opts.color || "000000", font: FONT })]
+      })]
+    });
+  }
+
+  const bgeLiSubject = liSubjectKey(BGE_SUBJECT);
+  const children = [
+    new Paragraph({
+      children: [new TextRun({ text: "BGE / Topics — Whole Year", bold: true, size: 30, font: FONT, color: "0F7A73" })],
+      spacing: { after: 100 }
+    }),
+    new Paragraph({
+      children: [new TextRun({ text: "Each column is a 6-week topic/writing block spanning the whole year, colour-tinted by which cycle it falls in.", size: 18, font: FONT, color: "444444" })],
+      spacing: { after: 250 }
+    })
+  ];
+
+  for(let start = 0; start < BGE_AUTO_FILL_PLAN.length; start += BLOCKS_PER_TABLE){
+    const blocks = BGE_AUTO_FILL_PLAN.slice(start, start + BLOCKS_PER_TABLE);
+    const colWidths = [LABEL_COL, ...blocks.map(()=>blockColWidth)];
+
+    const headerCells = [cell("Curricular Area", { width: LABEL_COL, fill: "0F7A73", bold: true, color: "FFFFFF" })];
+    blocks.forEach(block=>{
+      const { cycleNum } = globalWeekToLocal(block.weekStart);
+      const tint = hexNoHash(lightenHex(CYCLE_COLORS[cycleNum], 0.55));
+      const label = block.liKey.replace(/^Block \d+ — /, '');
+      const weekLabel = block.weekStart === block.weekEnd ? `Wk${block.weekStart}` : `Wk${block.weekStart}-${block.weekEnd}`;
+      const startDate = globalWeekDate(block.weekStart);
+      const endDate = globalWeekDate(block.weekEnd);
+      const dateLabel = block.weekStart === block.weekEnd ? startDate : [startDate, endDate].filter(Boolean).join(' – ');
+      const headerText = `${label}\n${weekLabel} · Cycle ${cycleNum}${dateLabel ? '\n' + dateLabel : ''}${block.bigQuestion ? '\n' + block.bigQuestion : ''}`;
+      headerCells.push(cell(headerText, { width: blockColWidth, fill: tint, bold: true, size: 16 }));
+    });
+    const rows = [new TableRow({ tableHeader: true, children: headerCells })];
+
+    const liCells = [cell("Learning Intention", { width: LABEL_COL, bold: true })];
+    blocks.forEach(block=>{
+      const { cycleNum, localWi } = globalWeekToLocal(block.weekStart);
+      const c = state.cycles[cycleNum];
+      const text = c.cells[cellKey(bgeLiSubject, localWi)] || "";
+      liCells.push(cell(text, { width: blockColWidth, italics: true }));
+    });
+    rows.push(new TableRow({ children: liCells }));
+
+    BGE_SPLIT_SUBJECTS.forEach(subject=>{
+      const rowCells = [cell(subject, { width: LABEL_COL, bold: true })];
+      blocks.forEach(block=>{
+        const { cycleNum, localWi } = globalWeekToLocal(block.weekStart);
+        const c = state.cycles[cycleNum];
+        const text = c.cells[cellKey(subject, localWi)] || "";
+        rowCells.push(cell(text, { width: blockColWidth }));
+      });
+      rows.push(new TableRow({ children: rowCells }));
+    });
+
+    children.push(new Table({
+      width: { size: TOTAL_WIDTH, type: WidthType.DXA },
+      columnWidths: colWidths,
+      rows
+    }));
+    children.push(new Paragraph({ children: [], spacing: { after: 200 } }));
+  }
+
+  try{
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            size: { width: 16838, height: 11906 },
+            margin: { top: 720, bottom: 720, left: 720, right: 720 }
+          }
+        },
+        children
+      }]
+    });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bge-topics-whole-year.docx`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 30000);
+  }catch(e){
+    alert("Couldn't generate the Word document: " + (e.message || "unknown error"));
+  }
+}
+document.getElementById('bgeWordBtn').addEventListener('click', downloadBgeDoc);
 
 /* ============ ETHOS CALENDAR (whole-school events → Ethos row) ============ */
 const CALENDAR_EVENTS = [
