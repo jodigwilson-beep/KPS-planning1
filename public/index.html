@@ -568,6 +568,7 @@ function goto(view){
 
 /* ============ PLANNER ============ */
 const SUBJECTS = [
+  "School Calendar",
   "Ethos and Life of the School",
   "Health and Wellbeing / RME",
   "P.E",
@@ -1372,7 +1373,7 @@ function render(){
       </th>
     `).join('');
 
-  const SINGLE_ROW_SUBJECTS = new Set(["Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
+  const SINGLE_ROW_SUBJECTS = new Set(["School Calendar", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
 
   const body = document.getElementById('bodyRows');
   body.innerHTML = PLANNER_DISPLAY_SUBJECTS.map((subject, idx)=>{
@@ -1384,6 +1385,7 @@ function render(){
         const cls = text ? "cell-inner filled" : "cell-inner empty";
         const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
         let hint = "";
+        if(subject === "School Calendar") hint = calendarHint(w.date);
         if(subject === "Literacy – Spelling/Phonics") hint = phonicsHint(globalWeek);
         if(subject === "Literacy – Handwriting") hint = handwritingHint(globalWeek);
         if(subject === "P.E") hint = peHint(globalWeek);
@@ -1391,7 +1393,7 @@ function render(){
         return `<td class="cell"><div class="${cls}" data-subject="${escapeAttr(subject)}" data-wi="${wi}">${text ? escapeHtml(text) : "+ add"}${hintHtml}</div></td>`;
       }).join('');
       return `<tr class="single-row">
-        <td class="subject-cell ${stripe}">${escapeHtml(subject)}<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span></td>
+        <td class="subject-cell ${stripe}">${escapeHtml(subject)}${subject === "School Calendar" ? "" : `<span class="bank-link" data-subject="${escapeAttr(subject)}">Manage bank →</span>`}</td>
         ${cells}
       </tr>`;
     }
@@ -1499,6 +1501,89 @@ function autoFillBgeFromPlan(){
     : "Those weeks already have content — nothing was changed.");
 }
 document.getElementById('bgeAutoFillBtn').addEventListener('click', autoFillBgeFromPlan);
+
+/* ============ ETHOS CALENDAR (whole-school events → Ethos row) ============ */
+const CALENDAR_EVENTS = [
+  { date: "1 September 2026", label: "Kintore School Parent Group Meeting" },
+  { date: "9 September 2026", label: "School Open Afternoon" },
+  { date: "19 September 2026", label: "Maths Week Scotland" },
+  { date: "21 September 2026", label: "Pupil Voice Week" },
+  { date: "26 September 2026", label: "European Day of Languages" },
+  { date: "28 September 2026", label: "Dyslexia Awareness Week" },
+  { date: "30 September 2026", label: "Parents' Evening" },
+  { date: "1 October 2026", label: "Black History Month begins" },
+  { date: "1 October 2026", label: "National Poetry Day" },
+  { date: "9 October 2026", label: "Harvest Service (Kintore School)" },
+  { date: "10 October 2026", label: "World Mental Health Day" },
+  { date: "30 October 2026", label: "Kintore School Parent Disco" },
+  { date: "3 November 2026", label: "Kintore School Parent Group Meeting" },
+  { date: "5 November 2026", label: "Outdoor Classroom Day" },
+  { date: "12 November 2026", label: "Children in Need" },
+  { date: "16 November 2026", label: "World Diabetes Day" },
+  { date: "17 November 2026", label: "Anti-Bullying Week" },
+  { date: "20 November 2026", label: "World Children's Day" },
+  { date: "30 November 2026", label: "St Andrew's Day" },
+  { date: "10 December 2026", label: "P2 and P3 Nativity" },
+  { date: "16 December 2026", label: "P2 and P3 Christmas Party" },
+  { date: "12 January 2027", label: "Kintore School Parent Group Meeting" },
+  { date: "25 January 2027", label: "Burns Night" },
+  { date: "1 February 2027", label: "Children's Mental Health Week" },
+  { date: "5 February 2027", label: "School Open Morning" },
+  { date: "17 February 2027", label: "Random Acts of Kindness Day" },
+  { date: "19 February 2027", label: "Kintore School Parent Group Disco" },
+  { date: "4 March 2027", label: "World Book Day" },
+  { date: "5 March 2027", label: "British Science Week" },
+  { date: "15 March 2027", label: "Neurodiversity Celebration Week" },
+  { date: "21 March 2027", label: "World Down Syndrome Day" },
+  { date: "22 March 2027", label: "World Water Day" },
+  { date: "22 March 2027", label: "Big Walk and Wheel" },
+  { date: "25 March 2027", label: "Easter Service (Kintore Church)" },
+  { date: "20 April 2027", label: "Kintore School Parent Group Meeting" },
+  { date: "22 April 2027", label: "World Earth Day" },
+  { date: "5 May 2027", label: "Deaf Awareness Week" },
+  { date: "6 May 2027", label: "Sharing My Learning Event" },
+  { date: "26 May 2027", label: "P1-P7 Sports Day" },
+  { date: "8 June 2027", label: "Kintore School Parent Group AGM" },
+  { date: "11 June 2027", label: "Kintore School Parent Group Disco" },
+  { date: "14 June 2027", label: "Book Week Scotland" },
+  { date: "16 June 2027", label: "Transition Activities" },
+  { date: "24 June 2027", label: "P7 Leavers Show" },
+  { date: "25 June 2027", label: "House Captain and Vice-Captain Elections" },
+  { date: "30 June 2027", label: "End of Session Awards Assembly" }
+];
+
+function parseUkDate(str){
+  const m = String(str).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(!m) return null;
+  let d = parseInt(m[1]), mo = parseInt(m[2]) - 1, y = parseInt(m[3]);
+  if(y < 100) y += 2000;
+  return new Date(y, mo, d);
+}
+function parseLongDate(str){
+  const months = {January:0,February:1,March:2,April:3,May:4,June:5,July:6,August:7,September:8,October:9,November:10,December:11};
+  const m = String(str).match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+  if(!m) return null;
+  const mo = months[m[2]];
+  if(mo === undefined) return null;
+  return new Date(parseInt(m[3]), mo, parseInt(m[1]));
+}
+
+function calendarHint(dateStr){
+  const weekStart = parseUkDate(dateStr);
+  if(!weekStart) return "";
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const matches = CALENDAR_EVENTS.filter(ev=>{
+    const evDate = parseLongDate(ev.date);
+    return evDate && evDate >= weekStart && evDate <= weekEnd;
+  });
+  const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return matches.map(ev=>{
+    const d = parseLongDate(ev.date);
+    const dateLabel = d ? `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}` : "";
+    return dateLabel ? `${dateLabel}: ${ev.label}` : ev.label;
+  }).join("\n");
+}
 
 function renderBgeView(){
   const headRow = document.getElementById('bgeHeadRow');
@@ -1671,7 +1756,7 @@ function renderWeeklyView(){
         let taskChipsText = "";
         if(act.subject){
           const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
-          const hint = getWeekProgramHintForExport(act.subject, globalWeek);
+          const hint = getWeekProgramHintForExport(act.subject, globalWeek, c.weeks[wi] && c.weeks[wi].date);
           const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
           let ca = "";
           if(act.subject === BGE_SUBJECT){
@@ -1728,6 +1813,7 @@ function openCellEditor(subject, wi, taskChipsText){
 
   const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
   let progHint = "";
+  if(subject === "School Calendar") progHint = calendarHint(cur().weeks[wi].date);
   if(subject === "Literacy – Spelling/Phonics") progHint = phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") progHint = handwritingHint(globalWeek);
   if(subject === "P.E") progHint = peHint(globalWeek);
@@ -2035,7 +2121,8 @@ document.getElementById('bankClose').addEventListener('click', ()=>{
 document.getElementById('cycleTitle').addEventListener('change', e=>{ cur().cycleTitle = e.target.value; persist(); });
 document.getElementById('className').addEventListener('change', e=>{ cur().className = e.target.value; persist(); });
 
-function getWeekProgramHintForExport(subject, globalWeek){
+function getWeekProgramHintForExport(subject, globalWeek, weekDate){
+  if(subject === "School Calendar") return weekDate ? calendarHint(weekDate) : "";
   if(subject === "Literacy – Spelling/Phonics") return phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") return handwritingHint(globalWeek);
   if(subject === "P.E") return peHint(globalWeek);
@@ -2045,7 +2132,7 @@ function getWeekProgramHintForExport(subject, globalWeek){
 
 function getExportCellText(c, subject, wi){
   const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
-  const hint = getWeekProgramHintForExport(subject, globalWeek);
+  const hint = getWeekProgramHintForExport(subject, globalWeek, c.weeks[wi] && c.weeks[wi].date);
   let text = c.cells[cellKey(subject, wi)] || "";
   if(hint) text = text ? text + "\n" + hint : hint;
   return text;
@@ -2053,7 +2140,7 @@ function getExportCellText(c, subject, wi){
 
 function getExportCellTextForCycle(c, cycleNum, subject, wi){
   const globalWeek = (cycleNum - 1) * 10 + (wi + 1);
-  const hint = getWeekProgramHintForExport(subject, globalWeek);
+  const hint = getWeekProgramHintForExport(subject, globalWeek, c.weeks[wi] && c.weeks[wi].date);
   let text = c.cells[cellKey(subject, wi)] || "";
   if(hint) text = text ? text + "\n" + hint : hint;
   return text;
@@ -2091,7 +2178,7 @@ async function downloadWordDoc(){
   const actualTotal = SUBJECT_COL + weekColWidth * 5;
   const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
   const FONT = "Arial";
-  const SINGLE_ROW_SUBJECTS_DOC = new Set(["Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
+  const SINGLE_ROW_SUBJECTS_DOC = new Set(["School Calendar", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
 
   function cell(text, opts={}){
     return new TableCell({
@@ -2264,7 +2351,7 @@ async function downloadWeeklyPlanDoc(){
         let refText = "—";
         if(act.subject){
           const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
-          const hint = getWeekProgramHintForExport(act.subject, globalWeek);
+          const hint = getWeekProgramHintForExport(act.subject, globalWeek, c.weeks[wi] && c.weeks[wi].date);
           const li = c.cells[cellKey(liSubjectKey(act.subject), wi)] || "";
           let ca = "";
           if(act.subject === BGE_SUBJECT){
