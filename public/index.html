@@ -179,6 +179,17 @@
   .li-label{display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--ochre); margin-top:2px;}
 
   .weekly-day-card{background:#fff; border:1px solid var(--paper-line); border-radius:var(--radius); margin-bottom:16px; overflow:hidden;}
+
+  #timetableGrid{width:100%; border-collapse:collapse; background:#fff;}
+  #timetableGrid th{background:var(--board); color:#fff; font-family:'Quicksand',sans-serif; font-weight:600; padding:10px; text-align:left; font-size:13px;}
+  #timetableGrid td{border:1px solid var(--paper-line); padding:10px 12px; font-size:12.5px; vertical-align:top; white-space:pre-wrap;}
+  #timetableGrid td.tt-day{font-weight:700; color:#fff; font-family:'Quicksand',sans-serif; white-space:nowrap;}
+  #timetableGrid tr.tt-Mon td.tt-day{background:#2E86AB;}
+  #timetableGrid tr.tt-Tues td.tt-day{background:#A23B72;}
+  #timetableGrid tr.tt-Wed td.tt-day{background:#F18F01;}
+  #timetableGrid tr.tt-Thurs td.tt-day{background:#3B8C6E;}
+  #timetableGrid tr.tt-Fri td.tt-day{background:#C73E1D;}
+  #timetableGrid td.tt-break{font-style:italic; color:#8A8272; text-align:center;}
   .weekly-day-card h3{
     color:#fff; font-family:'Quicksand',sans-serif; font-size:15px;
     margin:0; padding:8px 14px; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
@@ -270,6 +281,7 @@
     <button class="nav-link" data-view="planner">P2K 26-27 Ten Week Plans</button>
     <button class="nav-link" data-view="bge">P2K 26-27 BGE/Topics</button>
     <button class="nav-link" data-view="weekly">P2K 26-27 Weekly Plan</button>
+    <button class="nav-link" data-view="timetable">P2K 26-27 Timetable</button>
     <button class="nav-link" id="syncSettingsBtn">🔑 Sync</button>
 
     <div class="nav-divider"></div>
@@ -303,6 +315,11 @@
           <h2>P2K 26-27 Weekly Plan</h2>
           <p>Your day-by-day timetable for a single week, with that week's focus pulled in from the Ten-Week Planner and space for your own daily detail.</p>
           <span class="go">Open Weekly Plan →</span>
+        </button>
+        <button class="tool-card" data-goto="timetable">
+          <h2>P2K 26-27 Timetable</h2>
+          <p>A plain reference view of your class's weekly timetable — the same grid as your school timetable document.</p>
+          <span class="go">Open Timetable →</span>
         </button>
       </div>
     </section>
@@ -368,6 +385,21 @@
       </div>
 
       <div id="weeklyBody"></div>
+    </section>
+
+    <!-- TIMETABLE (plain reference view) -->
+    <section id="view-timetable" class="hub-view">
+      <header>
+        <h1 style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">Class Timetable</h1>
+        <p style="margin:0; opacity:0.85;">A plain reference view of your weekly timetable — matches your school timetable document.</p>
+      </header>
+
+      <div class="grid-scroll">
+        <table id="timetableGrid">
+          <thead><tr id="timetableHeadRow"></tr></thead>
+          <tbody id="timetableBodyRows"></tbody>
+        </table>
+      </div>
     </section>
 
   </main>
@@ -1839,6 +1871,33 @@ const WEEKLY_TIMETABLE = {
 function dailyDetailKey(day, label){
   return `${day} · ${label} — Daily Detail`;
 }
+
+function renderTimetableView(){
+  const headRow = document.getElementById('timetableHeadRow');
+  headRow.innerHTML = ['Day','9-10.30','Break','10.45-12.15','Lunch','1-3'].map(h=>`<th>${escapeHtml(h)}</th>`).join('');
+
+  const days = ["Mon","Tues","Wed","Thurs","Fri"];
+  const body = document.getElementById('timetableBodyRows');
+  body.innerHTML = days.map(day=>{
+    const periods = WEEKLY_TIMETABLE[day];
+    function findSlot(time){
+      const p = periods.find(pp=>pp.time===time);
+      return p ? p.activities.map(a=>a.label).join('\n') : '';
+    }
+    const slot1 = findSlot("9-10.30");
+    const slot2 = findSlot("10.45-12.15");
+    const slot3 = findSlot("1-3");
+    return `<tr class="tt-${day}">
+      <td class="tt-day">${escapeHtml(day)}</td>
+      <td>${escapeHtml(slot1).replace(/\n/g,'<br>')}</td>
+      <td class="tt-break">Break</td>
+      <td>${escapeHtml(slot2).replace(/\n/g,'<br>')}</td>
+      <td class="tt-break">Lunch</td>
+      <td>${escapeHtml(slot3).replace(/\n/g,'<br>')}</td>
+    </tr>`;
+  }).join('');
+}
+renderTimetableView();
 
 function renderWeeklyView(){
   renderTabs('weeklyCycleTabs');
