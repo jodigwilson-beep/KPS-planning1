@@ -359,8 +359,6 @@
       <div style="margin-bottom:14px;">
         <button class="btn-ghost" id="bgeAutoFillBtn">Fill in BGE from topic plan</button>
         <button class="btn-ghost" id="bgeWordBtn">Download as Word</button>
-        <button class="btn-ghost" id="bgeResetWeeks1to12Btn">Fix weeks 1-12 (Class Charter / Pets)</button>
-        <button class="btn-ghost" id="bgeResetWeeks31to36Btn">Fix weeks 31-36 (Minibeasts)</button>
       </div>
 
       <div class="grid-scroll">
@@ -1530,54 +1528,6 @@ function autoFillBgeFromPlan(){
     : "Those weeks already have content — nothing was changed.");
 }
 document.getElementById('bgeAutoFillBtn').addEventListener('click', autoFillBgeFromPlan);
-
-function fixBgeWeekRange(minWeek, maxWeek, label){
-  if(!confirm(`This will clear the Learning Intention row and all five curricular area rows (Expressive Arts, Sciences, Social Studies, Technologies, Meta Skills) for weeks ${minWeek}-${maxWeek} only, then refill them with the correct ${label} content. Nothing else in your Ten-Week Planner or other BGE weeks will be touched. Continue?`)){
-    return;
-  }
-  const liSubject = liSubjectKey(BGE_SUBJECT);
-  const clearSubjects = [liSubject, ...BGE_SPLIT_SUBJECTS];
-  const targetBlocks = BGE_AUTO_FILL_PLAN.filter(b => b.weekStart >= minWeek && b.weekEnd <= maxWeek);
-
-  targetBlocks.forEach(block=>{
-    for(let gw = block.weekStart; gw <= block.weekEnd; gw++){
-      const { cycleNum, localWi } = globalWeekToLocal(gw);
-      const c = state.cycles[cycleNum];
-      if(!c) continue;
-      clearSubjects.forEach(subject=>{
-        delete c.cells[cellKey(subject, localWi)];
-      });
-    }
-  });
-
-  let filled = 0;
-  const liBank = BGE_LI_SEED[liSubject] || {};
-  const topicSubjects = ["Expressive Arts","Sciences","Social Studies","Technologies","Meta Skills"];
-  targetBlocks.forEach(block=>{
-    for(let gw = block.weekStart; gw <= block.weekEnd; gw++){
-      const { cycleNum, localWi } = globalWeekToLocal(gw);
-      const c = state.cycles[cycleNum];
-      if(!c) continue;
-      if(liBank[block.liKey]){
-        c.cells[cellKey(liSubject, localWi)] = liBank[block.liKey].join("\n");
-        filled++;
-      }
-      topicSubjects.forEach(subject=>{
-        const subjBank = TOPIC_TASKS_BGE_SEED[subject] || {};
-        if(subjBank[block.topicKey]){
-          c.cells[cellKey(subject, localWi)] = subjBank[block.topicKey].join("\n");
-          filled++;
-        }
-      });
-    }
-  });
-
-  persist();
-  render();
-  alert(`Cleared old content and filled in ${filled} cell(s) for weeks ${minWeek}-${maxWeek} with the correct ${label} content.`);
-}
-document.getElementById('bgeResetWeeks1to12Btn').addEventListener('click', ()=>fixBgeWeekRange(1, 12, "Class Charter / Pets"));
-document.getElementById('bgeResetWeeks31to36Btn').addEventListener('click', ()=>fixBgeWeekRange(31, 36, "Minibeasts"));
 
 async function downloadBgeDoc(){
   if(!window.docx){
