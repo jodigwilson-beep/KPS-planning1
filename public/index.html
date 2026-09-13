@@ -799,6 +799,46 @@ const WRITING_LI_SEED = {
   }
 };
 
+const MATHS_LI_SEED = {
+  [liSubjectKey("Mathematics")]: {
+    "Social Skills": [
+      "Sharing and fairness: I can share a group of items equally between friends and understand what makes it fair. (MNU 1-07a)"
+    ],
+    "Superheroes and Traditional Tales": [
+      "Patterns and sequences: I can continue and create a repeating pattern, e.g. a superhero symbol sequence. (MTH 1-13a)"
+    ],
+    "Arctic": [
+      "Measurement and comparison: I can measure and compare the size of Arctic animals using appropriate units."
+    ],
+    "Science and Design": [
+      "Measuring and recording: I can measure materials and record results from an experiment or design task. (MNU 1-11a, MNU 1-11b)"
+    ],
+    "Local Area / Pets / Minibeasts": [
+      "Grid references and data: I can use grid references to describe a location in our local area (MTH 1-19a), and record and display data, e.g. a graph of pets or minibeasts spotted."
+    ]
+  }
+};
+
+const FRENCH_LI_SEED = {
+  [liSubjectKey("1+2")]: {
+    "Social Skills": [
+      "Greetings and feelings: I can greet someone and ask how they are — Bonjour, ça va? — using kind, friendly language."
+    ],
+    "Superheroes and Traditional Tales": [
+      "Describing a hero: I can describe a superhero's qualities using simple French adjectives — fort/forte, rapide, gentil/gentille."
+    ],
+    "Arctic": [
+      "Arctic animals: I can name Arctic animals in French — l'ours polaire, le pingouin, le phoque."
+    ],
+    "Science and Design": [
+      "Colours and shapes: I can use French colour and shape words to describe a design or invention — carré, rond, rouge, bleu."
+    ],
+    "Local Area / Pets / Minibeasts": [
+      "Pets and minibeasts: I can name pets and minibeasts in French — le chat, le chien, le poisson, l'araignée."
+    ]
+  }
+};
+
 const BGE_LI_SEED = {
   [liSubjectKey(BGE_SUBJECT)]: {
     "Block 1 — Social Skills": [
@@ -1307,7 +1347,7 @@ function migrateSubjects(){
 
 function backfillBankThemes(){
   let changed = false;
-  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED];
+  const themedSeeds = [RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, MATHS_LI_SEED, FRENCH_LI_SEED];
   themedSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       const subjectData = seed[subject];
@@ -2951,7 +2991,7 @@ document.getElementById('bankCoverageBtn').addEventListener('click', downloadBan
 
 document.getElementById('loadLiteracyBtn').addEventListener('click', ()=>{
   let added = 0;
-  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
+  const allSeeds = [LITERACY_SEED, NUMERACY_SEED, PE_SEED, RME_SEED, ETHOS_SEED, META_SKILLS_SEED, WRITING_LI_SEED, MATHS_LI_SEED, FRENCH_LI_SEED, BUNDLE2_SEED, BUNDLE2_SPLIT_SEED, MLAN_SEED, GRAMMAR_P2_SEED];
   allSeeds.forEach(seed=>{
     Object.keys(seed).forEach(subject=>{
       if(!state.banks[subject]) state.banks[subject] = [];
