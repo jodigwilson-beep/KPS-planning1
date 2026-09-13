@@ -1710,21 +1710,23 @@ async function downloadYearlyOverviewDoc(){
   }
 
   const children = [];
+  const CYCLE_HEX = { 1: "F5B400", 2: "F2701C", 3: "EE4D82", 4: "22B14C" };
 
   [1,2,3,4].forEach((n, idx)=>{
     const c = state.cycles[n];
     if(!c) return;
+    const cycleColor = CYCLE_HEX[n];
 
     children.push(new Paragraph({
-      children: [new TextRun({ text: c.cycleTitle, bold: true, size: 26, font: FONT, color: "FFFFFF" })],
-      shading: { type: ShadingType.CLEAR, fill: "0F7A73" },
+      children: [new TextRun({ text: c.cycleTitle, bold: true, size: 26, font: FONT, color: "000000" })],
+      shading: { type: ShadingType.CLEAR, fill: cycleColor },
       spacing: { after: 100 },
       pageBreakBefore: idx > 0
     }));
 
-    const headerCells = [cell("Curricular Area", { width: LABEL_COL, fill: "0F7A73", bold: true, color: "FFFFFF", size: 14 })];
+    const headerCells = [cell("Curricular Area", { width: LABEL_COL, fill: cycleColor, bold: true, color: "000000", size: 14 })];
     c.weeks.forEach((w, wi)=>{
-      headerCells.push(cell(`Wk${wi+1}\n${w.date}`, { width: weekColWidth, fill: "0F7A73", bold: true, color: "FFFFFF", size: 12 }));
+      headerCells.push(cell(`Wk${wi+1}\n${w.date}`, { width: weekColWidth, fill: cycleColor, bold: true, color: "000000", size: 12 }));
     });
     const rows = [new TableRow({ tableHeader: true, children: headerCells })];
 
@@ -1737,7 +1739,7 @@ async function downloadYearlyOverviewDoc(){
         }else{
           text = c.cells[cellKey(subject, wi)] || "";
         }
-        rowCells.push(cell(truncate(text, 40), { width: weekColWidth, size: 13 }));
+        rowCells.push(cell(text, { width: weekColWidth, size: 13 }));
       });
       rows.push(new TableRow({ children: rowCells }));
     });
