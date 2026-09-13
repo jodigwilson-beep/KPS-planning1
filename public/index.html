@@ -190,6 +190,18 @@
   #timetableGrid tr.tt-Thurs td.tt-day{background:#3B8C6E;}
   #timetableGrid tr.tt-Fri td.tt-day{background:#C73E1D;}
   #timetableGrid td.tt-break{font-style:italic; color:#8A8272; text-align:center;}
+
+  .yo-cycle-block{margin-bottom:28px; page-break-inside:avoid;}
+  .yo-cycle-title{
+    font-family:'Quicksand',sans-serif; font-weight:700; font-size:17px; margin:0 0 8px;
+    background:var(--board); color:#fff; padding:8px 14px; border-radius:8px 8px 0 0;
+  }
+  table.yo-table{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff;}
+  table.yo-table th, table.yo-table td{border:1px solid var(--paper-line); padding:5px 6px; font-size:10.5px; vertical-align:top; overflow-wrap:break-word;}
+  table.yo-table th{background:#F0EAD8; font-family:'Quicksand',sans-serif; font-weight:700; text-align:left; font-size:10px;}
+  table.yo-table .yo-date{display:block; font-weight:400; opacity:0.75; font-size:9px;}
+  td.yo-subject-cell{font-weight:700; background:#FBF8F0; white-space:normal;}
+  th.yo-subject-head{width:14%;}
   .weekly-day-card h3{
     color:#fff; font-family:'Quicksand',sans-serif; font-size:15px;
     margin:0; padding:8px 14px; cursor:pointer; display:flex; align-items:center; justify-content:space-between;
@@ -282,6 +294,7 @@
     <button class="nav-link" data-view="bge">P2K 26-27 BGE/Topics</button>
     <button class="nav-link" data-view="weekly">P2K 26-27 Weekly Plan</button>
     <button class="nav-link" data-view="timetable">P2K 26-27 Timetable</button>
+    <button class="nav-link" data-view="yearly">P2K 26-27 Yearly Overview</button>
     <button class="nav-link" id="syncSettingsBtn">🔑 Sync</button>
 
     <div class="nav-divider"></div>
@@ -321,6 +334,11 @@
           <p>A plain reference view of your class's weekly timetable — the same grid as your school timetable document.</p>
           <span class="go">Open Timetable →</span>
         </button>
+        <button class="tool-card" data-goto="yearly">
+          <h2>P2K 26-27 Yearly Overview</h2>
+          <p>A compact, summarised view of all four cycles at a glance — one page per cycle.</p>
+          <span class="go">Open Yearly Overview →</span>
+        </button>
       </div>
     </section>
 
@@ -359,6 +377,7 @@
       <div style="margin-bottom:14px;">
         <button class="btn-ghost" id="bgeAutoFillBtn">Fill in BGE from topic plan</button>
         <button class="btn-ghost" id="bgeWordBtn">Download as Word</button>
+        <button class="btn-ghost" id="bgeForceRefreshBtn">Reset all BGE weeks to current topic plan</button>
       </div>
 
       <div class="grid-scroll">
@@ -400,6 +419,20 @@
           <tbody id="timetableBodyRows"></tbody>
         </table>
       </div>
+    </section>
+
+    <!-- YEARLY OVERVIEW (compact, summarised, all 4 cycles) -->
+    <section id="view-yearly" class="hub-view">
+      <header>
+        <h1 style="font-family:'Quicksand',sans-serif; font-weight:700; font-size:24px; margin:0 0 4px; color:inherit;">Yearly Overview</h1>
+        <p style="margin:0; opacity:0.85;">A compact, summarised view of all four cycles — read-only. Edit content in the Ten-Week Planner; it'll update here automatically.</p>
+      </header>
+
+      <div style="margin-bottom:14px;">
+        <button class="btn-ghost" id="yearlyWordBtn">Download as Word</button>
+      </div>
+
+      <div id="yearlyOverviewBody"></div>
     </section>
 
   </main>
@@ -614,6 +647,7 @@ const SUBJECTS = [
   "Literacy – Listening and Talking",
   "Literacy – Handwriting",
   "1+2",
+  "BGE Summary",
   "Expressive Arts / Sciences / Social Studies / Technologies"
 ];
 const OLD_COMBINED_SUBJECT = "RME / Expressive Arts / Sciences / Social Studies / Technologies";
@@ -1368,7 +1402,7 @@ function render(){
       </th>
     `).join('');
 
-  const SINGLE_ROW_SUBJECTS = new Set(["School Calendar", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
+  const SINGLE_ROW_SUBJECTS = new Set(["School Calendar", "BGE Summary", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
 
   const body = document.getElementById('bodyRows');
   body.innerHTML = PLANNER_DISPLAY_SUBJECTS.map((subject, idx)=>{
@@ -1381,6 +1415,7 @@ function render(){
         const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
         let hint = "";
         if(subject === "School Calendar") hint = calendarHint(w.date);
+        if(subject === "BGE Summary") hint = truncate(c.cells[cellKey(liSubjectKey(BGE_SUBJECT), wi)] || "", 90);
         if(subject === "Literacy – Spelling/Phonics") hint = phonicsHint(globalWeek);
         if(subject === "Literacy – Handwriting") hint = handwritingHint(globalWeek);
         if(subject === "P.E") hint = peHint(globalWeek);
@@ -1437,6 +1472,7 @@ function render(){
 
   renderBgeView();
   renderWeeklyView();
+  renderYearlyOverview();
 }
 
 const BGE_AUTO_FILL_PLAN = [
@@ -1493,6 +1529,51 @@ function autoFillBgeFromPlan(){
     : "Those weeks already have content — nothing was changed.");
 }
 document.getElementById('bgeAutoFillBtn').addEventListener('click', autoFillBgeFromPlan);
+
+function forceRefreshAllBge(){
+  if(!confirm("This will clear the Learning Intention row and all five curricular area rows (Expressive Arts, Sciences, Social Studies, Technologies, Meta Skills) for EVERY week across all 4 cycles, then refill them with the current topic plan (Social Skills, Superheroes and Traditional Tales, Arctic, Science and Design, Local Area/Pets/Minibeasts, Revision). Nothing else in your Ten-Week Planner will be touched. Continue?")){
+    return;
+  }
+  const liSubject = liSubjectKey(BGE_SUBJECT);
+  const clearSubjects = [liSubject, ...BGE_SPLIT_SUBJECTS];
+
+  [1,2,3,4].forEach(n=>{
+    const c = state.cycles[n];
+    if(!c) return;
+    c.weeks.forEach((w, wi)=>{
+      clearSubjects.forEach(subject=>{
+        delete c.cells[cellKey(subject, wi)];
+      });
+    });
+  });
+
+  let filled = 0;
+  const liBank = BGE_LI_SEED[liSubject] || {};
+  const topicSubjects = ["Expressive Arts","Sciences","Social Studies","Technologies","Meta Skills"];
+  BGE_AUTO_FILL_PLAN.forEach(block=>{
+    for(let gw = block.weekStart; gw <= block.weekEnd; gw++){
+      const { cycleNum, localWi } = globalWeekToLocal(gw);
+      const c = state.cycles[cycleNum];
+      if(!c) continue;
+      if(liBank[block.liKey]){
+        c.cells[cellKey(liSubject, localWi)] = liBank[block.liKey].join("\n");
+        filled++;
+      }
+      topicSubjects.forEach(subject=>{
+        const subjBank = TOPIC_TASKS_BGE_SEED[subject] || {};
+        if(subjBank[block.topicKey]){
+          c.cells[cellKey(subject, localWi)] = subjBank[block.topicKey].join("\n");
+          filled++;
+        }
+      });
+    }
+  });
+
+  persist();
+  render();
+  alert(`Cleared all old BGE content and filled in ${filled} cell(s) matching the current topic plan.`);
+}
+document.getElementById('bgeForceRefreshBtn').addEventListener('click', forceRefreshAllBge);
 
 async function downloadBgeDoc(){
   if(!window.docx){
@@ -1602,6 +1683,96 @@ async function downloadBgeDoc(){
   }
 }
 document.getElementById('bgeWordBtn').addEventListener('click', downloadBgeDoc);
+
+async function downloadYearlyOverviewDoc(){
+  if(!window.docx){
+    alert("Word export library hasn't loaded yet — check your connection and try again in a moment.");
+    return;
+  }
+  const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun, WidthType, ShadingType, VerticalAlign } = window.docx;
+
+  const FONT = "Arial";
+  const CELL_MARGINS = { top: 30, bottom: 30, left: 50, right: 50 };
+  const TOTAL_WIDTH = 15300;
+  const LABEL_COL = 2100;
+  const weekColWidth = Math.floor((TOTAL_WIDTH - LABEL_COL) / 10);
+
+  function cell(text, opts={}){
+    return new TableCell({
+      width: { size: opts.width, type: WidthType.DXA },
+      shading: opts.fill ? { type: ShadingType.CLEAR, fill: opts.fill } : undefined,
+      verticalAlign: VerticalAlign.TOP,
+      margins: CELL_MARGINS,
+      children: [new Paragraph({
+        children: [new TextRun({ text: text || "", bold: !!opts.bold, size: opts.size || 13, color: opts.color || "000000", font: FONT })]
+      })]
+    });
+  }
+
+  const children = [];
+
+  [1,2,3,4].forEach((n, idx)=>{
+    const c = state.cycles[n];
+    if(!c) return;
+
+    children.push(new Paragraph({
+      children: [new TextRun({ text: c.cycleTitle, bold: true, size: 26, font: FONT, color: "FFFFFF" })],
+      shading: { type: ShadingType.CLEAR, fill: "0F7A73" },
+      spacing: { after: 100 },
+      pageBreakBefore: idx > 0
+    }));
+
+    const headerCells = [cell("Curricular Area", { width: LABEL_COL, fill: "0F7A73", bold: true, color: "FFFFFF", size: 14 })];
+    c.weeks.forEach((w, wi)=>{
+      headerCells.push(cell(`Wk${wi+1}\n${w.date}`, { width: weekColWidth, fill: "0F7A73", bold: true, color: "FFFFFF", size: 12 }));
+    });
+    const rows = [new TableRow({ tableHeader: true, children: headerCells })];
+
+    PLANNER_DISPLAY_SUBJECTS.forEach(subject=>{
+      const rowCells = [cell(subject, { width: LABEL_COL, bold: true, size: 13 })];
+      c.weeks.forEach((w, wi)=>{
+        let text;
+        if(SINGLE_ROW_SUBJECTS_YO.has(subject)){
+          text = getExportCellText(c, subject, wi);
+        }else{
+          text = c.cells[cellKey(subject, wi)] || "";
+        }
+        rowCells.push(cell(truncate(text, 40), { width: weekColWidth, size: 13 }));
+      });
+      rows.push(new TableRow({ children: rowCells }));
+    });
+
+    children.push(new Table({
+      width: { size: TOTAL_WIDTH, type: WidthType.DXA },
+      columnWidths: [LABEL_COL, ...PLANNER_DISPLAY_SUBJECTS.map(()=>weekColWidth)],
+      rows
+    }));
+  });
+
+  try{
+    const doc = new Document({
+      sections: [{
+        properties: {
+          page: {
+            size: { width: 16838, height: 11906 },
+            margin: { top: 500, bottom: 500, left: 500, right: 500 }
+          }
+        },
+        children
+      }]
+    });
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `yearly-overview.docx`;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url), 30000);
+  }catch(e){
+    alert("Couldn't generate the Word document: " + (e.message || "unknown error"));
+  }
+}
+document.getElementById('yearlyWordBtn').addEventListener('click', downloadYearlyOverviewDoc);
 
 /* ============ ETHOS CALENDAR (whole-school events → Ethos row) ============ */
 const CALENDAR_EVENTS = [
@@ -1857,6 +2028,34 @@ function renderTimetableView(){
 }
 renderTimetableView();
 
+function renderYearlyOverview(){
+  const container = document.getElementById('yearlyOverviewBody');
+  if(!container) return;
+  container.innerHTML = [1,2,3,4].map(n=>{
+    const c = state.cycles[n];
+    if(!c) return '';
+    const headerRow = '<tr><th class="yo-subject-head">Curricular Area</th>' +
+      c.weeks.map((w,i)=>`<th>Week ${i+1}<span class="yo-date">${escapeHtml(w.date)}</span></th>`).join('') + '</tr>';
+    const bodyRows = PLANNER_DISPLAY_SUBJECTS.map(subject=>{
+      const cells = c.weeks.map((w,wi)=>{
+        let text;
+        if(SINGLE_ROW_SUBJECTS_YO.has(subject)){
+          text = getExportCellText(c, subject, wi);
+        }else{
+          text = c.cells[cellKey(subject, wi)] || "";
+        }
+        return `<td>${text ? escapeHtml(truncate(text, 40)) : ""}</td>`;
+      }).join('');
+      return `<tr><td class="yo-subject-cell">${escapeHtml(subject)}</td>${cells}</tr>`;
+    }).join('');
+    return `<div class="yo-cycle-block">
+      <h2 class="yo-cycle-title">${escapeHtml(c.cycleTitle)}</h2>
+      <table class="yo-table"><thead>${headerRow}</thead><tbody>${bodyRows}</tbody></table>
+    </div>`;
+  }).join('');
+}
+const SINGLE_ROW_SUBJECTS_YO = new Set(["School Calendar", "BGE Summary", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
+
 function renderWeeklyView(){
   renderTabs('weeklyCycleTabs');
   const c = cur();
@@ -1942,6 +2141,7 @@ function openCellEditor(subject, wi, taskChipsText){
   const globalWeek = (state.activeCycle - 1) * 10 + (wi + 1);
   let progHint = "";
   if(subject === "School Calendar") progHint = calendarHint(cur().weeks[wi].date);
+  if(subject === "BGE Summary") progHint = truncate(cur().cells[cellKey(liSubjectKey(BGE_SUBJECT), wi)] || "", 90);
   if(subject === "Literacy – Spelling/Phonics") progHint = phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") progHint = handwritingHint(globalWeek);
   if(subject === "P.E") progHint = peHint(globalWeek);
@@ -2251,6 +2451,12 @@ document.getElementById('className').addEventListener('change', e=>{ cur().class
 
 function getWeekProgramHintForExport(subject, globalWeek, weekDate){
   if(subject === "School Calendar") return weekDate ? calendarHint(weekDate) : "";
+  if(subject === "BGE Summary"){
+    const { cycleNum, localWi } = globalWeekToLocal(globalWeek);
+    const c = state.cycles[cycleNum];
+    const text = c ? (c.cells[cellKey(liSubjectKey(BGE_SUBJECT), localWi)] || "") : "";
+    return text ? truncate(text, 90) : "";
+  }
   if(subject === "Literacy – Spelling/Phonics") return phonicsHint(globalWeek);
   if(subject === "Literacy – Handwriting") return handwritingHint(globalWeek);
   if(subject === "P.E") return peHint(globalWeek);
@@ -2306,7 +2512,7 @@ async function downloadWordDoc(){
   const actualTotal = SUBJECT_COL + weekColWidth * 5;
   const CELL_MARGINS = { top: 40, bottom: 40, left: 80, right: 80 };
   const FONT = "Arial";
-  const SINGLE_ROW_SUBJECTS_DOC = new Set(["School Calendar", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
+  const SINGLE_ROW_SUBJECTS_DOC = new Set(["School Calendar", "BGE Summary", "Literacy – Spelling/Phonics", "Literacy – Handwriting", "P.E"]);
 
   function cell(text, opts={}){
     return new TableCell({
